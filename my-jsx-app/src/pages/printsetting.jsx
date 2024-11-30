@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../css/printsetting.css";
 import { useNavigate } from "react-router-dom";
+import { Printte } from "./PdfViewer";
 export const PrintPage = () => {
   const [copies, setCopies] = useState(1);
   const [orientation, setOrientation] = useState("Portrait");
@@ -138,12 +139,7 @@ export const PrintPage = () => {
       <main className="preview">
         <h2>Print Preview</h2>
         <div className={`page-preview ${orientation.toLowerCase()}`}>
-          <p>Page size: {pageSize}</p>
-          <p>Orientation: {orientation}</p>
-          <p>Margin: {margin}</p>
-          <p>Pages per Sheet: {pagesPerSheet}</p>
-          {pageRange === "custom" && <p>Pages: {customPages}</p>}
-          {duplex === "Yes" && <p>Printing on both sides</p>}
+        <Printte pdfUrl="https://res.cloudinary.com/dzaaf6exo/image/upload/v1732980102/adxplfmxtsud5dgwk8yy.pdf" />
         </div>
       </main>
     </div>

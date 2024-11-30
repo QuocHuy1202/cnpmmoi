@@ -11,6 +11,7 @@ body {
 /* Sidebar styles */
 .sidebar {
     width: 300px;
+    height:800px;
     background-color: #f5f5f5;
     padding: 20px;
     border-right: 1px solid #ddd;
@@ -39,7 +40,7 @@ select {
 }
 
 .buttons {
-    margin-top: auto;
+    margin-bottom: auto;
     display: flex;
     gap: 10px;
 }
@@ -68,38 +69,52 @@ select {
 .preview {
     flex: 1;
     padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    width: 500px;
+    height:800px;
     background-color: #ffffff;
+    display: block; /* Thay đổi từ flex sang block */
 }
 
 .page-preview {
-    width: auto; /* Chiếm 90% chiều rộng màn hình */
-    height: 80%; /* Để chiều cao tự động điều chỉnh */
-    max-width: 210mm; /* Giới hạn chiều rộng tối đa của A4 */
-    max-height: 297mm; /* Giới hạn chiều cao tối đa của A4 */
+    margin-top: 20px; /* Khoảng cách 20px từ phần tử phía trên */
+    width: auto;
+    height: 80%; /* Đảm bảo chiều cao tự động điều chỉnh */
+    max-width: 210mm;
+    max-height: 297mm;
     border: 1px solid #ddd;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
     font-size: 14px;
     color: #666;
     background-color: white;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     margin: auto;
     box-sizing: border-box;
-    aspect-ratio: 210 / 297; /* Tỷ lệ chuẩn của giấy A4 portrait */
+    aspect-ratio: 210 / 297;
 }
 
+
 .page-preview.landscape {
-    width: 70%; /* Chiếm 90% chiều rộng màn hình */
+    width: 80%; /* Chiếm 90% chiều rộng màn hình */
     height: auto;
     max-width: 297mm; /* Giới hạn chiều rộng tối đa của A4 landscape */
     max-height: 210mm; /* Giới hạn chiều cao tối đa của A4 landscape */
     aspect-ratio: 297 / 210; /* Tỷ lệ chuẩn của giấy A4 landscape */
 }
 
+.page-preview canvas {
+    width: 100%;
+    height: 100%;
+    /* Đảm bảo canvas không vượt qua khung */
+}
+
+/* Khi hướng là Landscape */
+.page-preview.landscape canvas {
+    width: 100%;
+    height: auto;
+    max-width: 297mm;  /* Giới hạn chiều rộng tối đa cho Landscape */
+    max-height: 210mm; /* Giới hạn chiều cao tối đa cho Landscape */
+    aspect-ratio: 297 / 210; /* Tỷ lệ Landscape */
+}
 

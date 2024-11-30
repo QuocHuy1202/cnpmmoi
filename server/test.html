@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Display Files from Cloudinary</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #fileContainer {
+      margin-top: 20px;
+    }
+    iframe {
+      border: none;
+    }
+    a {
+      color: #007bff;
+      text-decoration: none;
+      margin-bottom: 10px;
+      display: block;
+    }
+    #pdf-container {
+      width: 100%;
+      height: 600px;
+      overflow: scroll;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+</head>
+<body>
+  <h1>Files from Cloudinary</h1>
+  <div id="fileContainer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const email = 'user1@hcmut.edu.vn'; // Thay bằng email bạn muốn
+
+    // Gửi yêu cầu GET để lấy file từ API
+    axios.get(`http://localhost:5000/api/files/${email}`)
+      .then(response => {
+        const files = response.data.files;
+        const fileContainer = document.getElementById('fileContainer');
+
+        if (files.length > 0) {
+          files.forEach(file => {
+            const fileType = file.fileType;
+            const fileName = file.fileName;
+            const filePath = file.filePath; // Đường dẫn file từ Cloudinary
+
+            // Kiểm tra nếu là file PDF
+            if (fileType === 'pdf') {
+              // Hiển thị PDF sử dụng PDF.js
+              const pdfContainer = document.createElement('div');
+              pdfContainer.id = 'pdf-container';
+
+              fileContainer.appendChild(pdfContainer);
+
+              // Load PDF bằng PDF.js
+              pdfjsLib.getDocument(filePath).promise.then(pdf => {
+                console.log('PDF loaded');
+                const totalPages = pdf.numPages;
+                let currentPage = 1;
+
+                function renderPage(pageNum) {
+                  pdf.getPage(pageNum).then(page => {
+                    const scale = 1.5;
+                    const viewport = page.getViewport({ scale: scale });
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    pdfContainer.appendChild(canvas);
+
+                    page.render({
+                      canvasContext: context,
+                      viewport: viewport
+                    });
+                  });
+                }
+
+                renderPage(currentPage);
+
+                // Hiển thị các trang còn lại (nếu có)
+                const nextButton = document.createElement('button');
+                nextButton.innerText = 'Next';
+                nextButton.onclick = () => {
+                  if (currentPage < totalPages) {
+                    currentPage++;
+                    renderPage(currentPage);
+                  }
+                };
+                fileContainer.appendChild(nextButton);
+
+              }).catch(error => {
+                console.error('Error loading PDF:', error);
+                fileContainer.innerHTML = `<p>Error loading PDF file: ${fileName}</p>`;
+              });
+            } 
+            // Kiểm tra nếu là file hình ảnh (ví dụ: jpeg, png, jpg)
+            else if (fileType === 'jpg' || fileType === 'jpeg' || fileType === 'png' || fileType === 'gif') {
+              const image = document.createElement('img');
+              image.src = filePath;
+              image.alt = fileName;
+              image.width = 600; // Giới hạn kích thước ảnh
+              image.style.marginBottom = "20px";
+              fileContainer.appendChild(image);
+            } 
+            else {
+              // Hiển thị các file khác dưới dạng liên kết tải về
+              const link = document.createElement('a');
+              link.href = filePath;
+              link.download = fileName;
+              link.textContent = `Download ${fileName}`;
+              fileContainer.appendChild(link);
+              fileContainer.appendChild(document.createElement('br'));
+            }
+          });
+        } else {
+          fileContainer.innerHTML = "<p>No files found for this email.</p>";
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching files:', error);
+        const fileContainer = document.getElementById('fileContainer');
+        fileContainer.innerHTML = "<p>Error fetching files. Please try again later.</p>";
+      });
+  <
