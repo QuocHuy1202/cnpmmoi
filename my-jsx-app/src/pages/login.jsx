@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "../css/login.css";
 import { toast, ToastContainer } from "react-toastify";  // Import toast and ToastContainer
 
-const backendUrl = "http://localhost:3000";
+const backendUrl = "http://localhost:5000";
 
 export const Login = () => {
   const [email, setUsername] = useState("");
@@ -33,7 +33,8 @@ export const Login = () => {
         if (response.ok) {
           // Successful login
           const data = await response.json();
-          setToken(data.token); // Save token in state
+          setToken(data.token);
+          console.log(data.token); // Save token in state
           localStorage.setItem("token", data.token); // Store token in localStorage
           
           toast.success("Đăng nhập thành công!"); // Show success message
