@@ -1,0 +1,121 @@
+/* Tổng thể */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header */
+.login-header {
+    background-color: #007bff; /* Màu xanh header */
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.login-header .logo img {
+    height: 50px;
+    margin-right: 15px;
+}
+
+.login-header h1 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+/* Main Section */
+.login-main {
+    flex: 1;
+    background-color: #ffffff; /* Nền xám phần form đăng nhập */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.login-box {
+    background-color: rgb(228, 228, 228); /* Nền trắng cho form */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 300px;
+}
+
+.login-box h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+    color: #a4a4a4;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.button-group {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.login-button {
+    background-color: #007bff; /* Màu nền xanh */
+    color: white; /* Màu chữ trắng */
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none; /* Loại bỏ gạch chân */
+    display: inline-block;
+    text-align: center;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background-color: #0056b3; /* Màu xanh đậm hơn khi hover */
+}
+.exit-button {
+    background-color: #007bff; /* Màu nền xanh */
+    color: white; /* Màu chữ trắng */
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none; /* Loại bỏ gạch chân */
+    display: inline-block;
+    text-align: center;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+
+.exit-button:hover {
+    background-color: #0056b3;
+}
+.error-message {
+    color: red; /* Màu đỏ cho thông báo lỗi */
+    font-size: 14px; /* Kích thước chữ */
+    margin-top: 10px; /* Khoảng cách phía trên */
+    font-weight: bold; /* Làm chữ đậm (tuỳ chọn) */
+    text-align: left; /* Canh lề trái (tuỳ chọn) */
+}

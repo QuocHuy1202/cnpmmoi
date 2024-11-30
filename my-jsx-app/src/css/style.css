@@ -1,0 +1,487 @@
+.trang-ch {
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .trang-ch .div {
+    background-color: #ffffff;
+    height: 100%;
+    position: relative;
+    width: 100%;
+  }
+  
+  .trang-ch .overlap-group {
+    background-color: #07b7fc;
+    height: 111px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: -2;
+  }
+  .trang-ch nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    width: 90%;  /* Đảm bảo ul chiếm hết chiều ngang */
+}
+
+.trang-ch nav ul li {
+    margin-left: 20px;
+    position: relative;
+    font-family: "Inter-Regular", Helvetica;
+    font-size: 32px;
+    font-weight: 400;
+    color: #fff;
+    line-height: normal;
+    display: flex;
+    align-items: center;
+    top: 40px;
+    left: 140px;
+}
+
+.trang-ch nav ul li a {
+    text-decoration: none;
+    color: inherit;
+    font-weight: inherit;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.trang-ch nav ul li:hover {
+    color: #f1f1f1;
+}
+
+/* Đẩy "Đăng Nhập" sang bên phải */
+.trang-ch nav ul li:last-child {
+  
+  margin-left:auto;
+ 
+    /* Đẩy phần tử cuối (Đăng Nhập) sang bên phải */
+}
+/* Cập nhật nav để phần "Trang Chủ" có gạch chân và hình chữ nhật xanh */
+.trang-ch nav ul li .home-link {
+  text-decoration: underline; /* Gạch chân chữ "Trang Chủ" */
+  color: inherit;
+  padding: 0px 30px;  /* Giữ màu chữ giống với các phần tử khác */
+}
+
+.trang-ch nav ul li .home-rectangle {
+  background-color: #4d12ff; /* Màu xanh cho hình chữ nhật */
+  height: 114px; /* Độ cao của hình chữ nhật */
+  position: absolute;
+   /* Đẩy xuống dưới chữ một chút */
+  left: 0;
+  width: 100%;
+  z-index: -1;
+    /* Chiều rộng của hình chữ nhật bao phủ toàn bộ "Trang Chủ" */
+}
+  .trang-ch .image {
+    height: 86px;
+    left: 22px;
+    object-fit: cover;
+    position: absolute;
+    top: 12px;
+    width: 99px;
+  }
+  
+  
+  
+  .trang-ch .overlap-2 {
+    background-image: url(../image/image-1.png);
+    background-position: 50% 50%;
+    background-size: cover;
+    height: 600px;
+    left: 0;
+    position: absolute;
+    top: 111px;
+    width: 100%;
+  }
+  
+  .trang-ch .rectangle {
+    background-color: #d9d9d9;
+    height: 280px;
+    left: 20px;
+    opacity: 0.8;
+    position: absolute;
+    top: 58px;
+    width: 50%;
+  }
+  
+  .trang-ch .d-ch-v-in-n-th-ng {
+    color: #000000;
+    font-family: "Inter-Regular", Helvetica;
+    font-size: 64px;
+    font-weight: 400;
+    left: 35px;
+    letter-spacing: 0;
+    line-height: 64px;
+    position: absolute;
+    top: 40px;
+    width: 786px;
+  }
+  @media (max-width:1500px){
+    .trang-ch nav ul li {
+      margin-left: 20px;
+      position: relative;
+      font-family: "Inter-Regular", Helvetica;
+      font-size: 20px;
+      font-weight: 400;
+      color: #fff;
+      line-height: normal;
+      display: flex;
+      align-items: center;
+      top: 30px;
+      left: 80px;
+  }
+  
+  .trang-ch nav ul li a {
+      text-decoration: none;
+      color: inherit;
+      font-weight: inherit;
+      font-family: inherit;
+      font-size: inherit;
+  }
+  
+  
+  /* Đẩy "Đăng Nhập" sang bên phải */
+  .trang-ch nav ul li:last-child {
+    
+    margin-left:auto;
+    margin-right:22%;
+      /* Đẩy phần tử cuối (Đăng Nhập) sang bên phải */
+  }
+  /* Cập nhật nav để phần "Trang Chủ" có gạch chân và hình chữ nhật xanh */
+  
+  .trang-ch .overlap-group {
+    background-color: #07b7fc;
+    height: 88px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: -2;
+  }
+  .trang-ch nav ul li .home-rectangle {
+    background-color: #4d12ff; /* Màu xanh cho hình chữ nhật */
+    height: 100px; /* Độ cao của hình chữ nhật */
+    position: absolute;
+     /* Đẩy xuống dưới chữ một chút */
+    left: 0;
+    width: 100%;
+    z-index: -1;
+      /* Chiều rộng của hình chữ nhật bao phủ toàn bộ "Trang Chủ" */
+  }
+  .trang-ch .image {
+          height: 77px;
+          left: 12px;
+          object-fit: cover;
+          position: absolute;
+          top: 0px;
+          width: 80px;
+      }
+  
+    
+    
+    
+    .trang-ch .overlap-2 {
+      background-image: url(../image/image-1.png);
+      background-position: 50% 50%;
+      background-size: cover;
+      height: 510px;
+      left: 0;
+      position: absolute;
+      top: 88px;
+      width: 100%;
+    }
+    
+    .trang-ch .rectangle {
+      background-color: #d9d9d9;
+      height: 35%;
+      left: 20px;
+      opacity: 0.8;
+      position: absolute;
+      top: 58px;
+      width: 40%;
+    }
+    
+    .trang-ch .d-ch-v-in-n-th-ng {
+      color: #000000;
+      font-family: "Inter-Regular", Helvetica;
+      font-size: 40px;
+      font-weight: 400;
+      left: 45px;
+      letter-spacing: 0;
+      line-height: 50px;
+      position: absolute;
+      top: 40px;
+      width: 35%;
+  }
+  }
+  @media (max-width: 1024px) {
+.trang-ch nav ul li {
+    margin-left: 20px;
+    position: relative;
+    font-family: "Inter-Regular", Helvetica;
+    font-size: 20px;
+    font-weight: 400;
+    color: #fff;
+    line-height: normal;
+    display: flex;
+    align-items: center;
+    top: 30px;
+    left: 80px;
+}
+
+.trang-ch nav ul li a {
+    text-decoration: none;
+    color: inherit;
+    font-weight: inherit;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+
+/* Đẩy "Đăng Nhập" sang bên phải */
+.trang-ch nav ul li:last-child {
+  
+  margin-left:auto;
+  margin-right:2%;
+    /* Đẩy phần tử cuối (Đăng Nhập) sang bên phải */
+}
+/* Cập nhật nav để phần "Trang Chủ" có gạch chân và hình chữ nhật xanh */
+
+.trang-ch .overlap-group {
+  background-color: #07b7fc;
+  height: 88px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: -2;
+}
+.trang-ch nav ul li .home-rectangle {
+  background-color: #4d12ff; /* Màu xanh cho hình chữ nhật */
+  height: 100px; /* Độ cao của hình chữ nhật */
+  position: absolute;
+   /* Đẩy xuống dưới chữ một chút */
+  left: 0;
+  width: 100%;
+  z-index: -1;
+    /* Chiều rộng của hình chữ nhật bao phủ toàn bộ "Trang Chủ" */
+}
+.trang-ch .image {
+        height: 77px;
+        left: 12px;
+        object-fit: cover;
+        position: absolute;
+        top: 0px;
+        width: 80px;
+    }
+
+  
+  
+  
+  .trang-ch .overlap-2 {
+    background-image: url(../image/image-1.png);
+    background-position: 50% 50%;
+    background-size: cover;
+    height: 510px;
+    left: 0;
+    position: absolute;
+    top: 88px;
+    width: 100%;
+    z-index:1;
+  }
+  
+  .trang-ch .rectangle {
+    background-color: #d9d9d9;
+    height: 45%;
+    left: 20px;
+    opacity: 0.8;
+    position: absolute;
+    top: 58px;
+    width: 55%;
+  }
+  
+  .trang-ch .d-ch-v-in-n-th-ng {
+    color: #000000;
+    font-family: "Inter-Regular", Helvetica;
+    font-size: 40px;
+    font-weight: 400;
+    left: 45px;
+    letter-spacing: 0;
+    line-height: 50px;
+    position: absolute;
+    top: 40px;
+    width: 50%;
+}
+
+  }
+  
+  @media (max-width: 768px) {
+    .trang-ch .overlap-2 {
+      background-image: url(../image/image-1.png);
+      background-position: 50% 50%;
+      background-size: cover;
+      height: 600px;
+      left: 0;
+      position: absolute;
+      
+      width: 100%;
+      z-index: -10;
+    }
+  .trang-ch .image {
+          height: 77px;
+          left: 50px;
+          object-fit: cover;
+          position: absolute;
+          top: 0px;
+          width: 80px;
+      }
+      .trang-ch nav ul li {
+        margin-left: 20px;
+        position: relative;
+        font-family: "Inter-Regular", Helvetica;
+        font-size: 32px;
+        font-weight: 400;
+        color: #fff;
+        line-height: normal;
+        display: flex;
+        align-items: center;
+        top: 25px;
+        left: 140px;
+    }
+  
+    .trang-ch nav ul {
+      flex-direction: column;
+      align-items: center;
+    }
+    .trang-ch .d-ch-v-in-n-th-ng {
+      color: #000000;
+      font-family: "Inter-Regular", Helvetica;
+      font-size: 64px;
+      font-weight: 400;
+      
+      letter-spacing: 0;
+      line-height: 64px;
+      position: absolute;
+      top: 40px;
+      width: 300px;
+    }
+    .trang-ch nav ul li {
+      font-size: 24px;
+      margin: 5px 0;
+      left: 0;
+    }
+  
+    .trang-ch .rectangle {
+      width: 45%;
+      height: 400px;
+      left: 5%;
+      
+    }
+    .trang-ch .d-ch-v-in-n-th-ng {
+      color: #000000;
+      font-family: "Inter-Regular", Helvetica;
+      font-size: 40px;
+      font-weight: 400;
+      left: 5%;
+      letter-spacing: 0;
+      line-height: 40px;
+      position: absolute;
+      top: 30px;
+      width: 40%;
+      text-align: center;
+    }
+   
+    
+  }
+  /* Nút menu popup */
+.menu-button {
+  display: none; /* Ẩn theo mặc định */
+  background-color: transparent;
+  border: none;
+  font-size: 2rem; /* Kích thước chữ cho dấu menu */
+  color: #121010; /* Màu chữ */
+  cursor: pointer;
+  z-index: 1001; /* Đảm bảo nút xuất hiện trên các phần tử khác */
+  position: absolute;
+  top: 15px; /* Căn vị trí nút menu ở góc trên bên trái */
+  left: 0px; /* Căn vị trí nút menu */
+}
+
+/* Khi màn hình nhỏ (dưới 768px) */
+@media screen and (max-width: 768px) {
+  .menu-button {
+    display: block; /* Hiển thị nút menu khi màn hình nhỏ */
+  }
+}
+/* Popup menu */
+/* Popup menu */
+.popup {
+  position: absolute;
+  top: 88px;
+  left: 0;
+  width: 45%;
+  height: 100vh;
+  background-color: #ffffff; /* Màu nền mờ */
+  display: flex;
+  flex-direction: column;
+  
+  z-index: 100; /* Đảm bảo menu popup nằm trên các phần tử khác */
+}
+
+/* Các phần tử trong menu popup */
+.popup ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.popup ul li {
+  padding: 10px 20px;
+  font-size: 18px;
+  text-align: left;
+  color: #121010;
+  border-bottom: 1px solid #d9d9d9; /* Thêm vạch ngăn cách */
+}
+.popup ul li a {
+  text-decoration: none;
+  color: #0a0a0a;
+  font-size: 20px;
+  font-weight: 100;
+  font-family: "Inter-Regular", Helvetica;
+  z-index: 1000;
+  left:10px;
+}
+
+
+
+/* Tùy chỉnh hover */
+.popup ul li:hover {
+  background-color: #f1f1f1;
+}
+@media screen and (max-width: 400px) {
+  .trang-ch .d-ch-v-in-n-th-ng {
+    color: #000000;
+    font-family: "Inter-Regular", Helvetica;
+    font-size: 32px;
+    font-weight: 400;
+    left: 5%;
+    letter-spacing: 0;
+    line-height: 40px;
+    position: absolute;
+    top: 30px;
+    width: 40%;
+    text-align: center;
+  }
+}
+h2 {
+  color: #000000;
+}
