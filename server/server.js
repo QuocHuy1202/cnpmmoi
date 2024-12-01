@@ -7,7 +7,7 @@ const multer = require("multer");
 const path = require("path");
 const cloudinary = require("cloudinary").v2;
 const app = express();
-const port = 5000;
+const port = 5001;
 
 app.use(bodyParser.json()); // Parse JSON request body
 app.use(cors());
@@ -21,9 +21,9 @@ cloudinary.config({
 
 const sqlConfig = {
   user: "sa",
-  password: "huy1202",
+  password: "123456aA@$",
   server: "localhost",
-  database: "AccountDB",
+  database: "AccountDB3",
   options: {
     encrypt: true,
     trustServerCertificate: true,

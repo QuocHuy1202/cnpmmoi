@@ -1,4 +1,4 @@
-/* Cấu trúc chung cho trang thanh toán */
+/* 
 .payment-container {
     display: flex;
     flex-direction: column;
@@ -81,4 +81,4 @@
   .payment-footer a:hover {
     text-decoration: underline;
   }
-  
+   */

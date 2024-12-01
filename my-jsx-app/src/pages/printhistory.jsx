@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import image from "../image/image.png";
-import chuong from "../image/chuong.png";
-import mess from "../image/mess.png";
 import avar from "../image/avar.svg";
 import "../css/printhistory.css";
 
@@ -11,16 +9,32 @@ export const PrintHistory = () => {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
   const [historyData, setHistoryData] = useState([]);
   const [selectedPrintSettings, setSelectedPrintSettings] = useState(null); // Lưu cài đặt in đã chọn
-
+  const [isAvatarPopupOpen, setIsAvatarPopupOpen] = useState(false); // Popup for avatar
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate(); // Hook to navigate user
+  const toggleAvatarPopup = () => {
+    setIsAvatarPopupOpen(!isAvatarPopupOpen); // Toggle avatar popup
+  };
+  const handleLogout = () => {
+    localStorage.clear(); // Xóa tất cả các mục trong localStorage
+    // Remove token from localStorage
+    setIsLoggedIn(false); // Update the logged-in status
+    navigate("/login"); // Redirect user to the login page
+  };
+  // Check if user is logged in
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token); // Set login status based on token existence
+  }, []);
   useEffect(() => {
     const fetchPrintHistory = async () => {
       try {
         const token = localStorage.getItem("token");
 
-        const response = await fetch("http://localhost:5000/history", {
+        const response = await fetch("http://localhost:5001/history", {
           method: "GET",
           headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -37,7 +51,6 @@ export const PrintHistory = () => {
         alert("Không thể lấy lịch sử in. Vui lòng thử lại.");
       }
     };
-
     fetchPrintHistory(); // Gọi API khi component được mount
   }, []);
 
@@ -67,18 +80,40 @@ export const PrintHistory = () => {
             </button>
           ) : (
             <nav className="navbar">
-              <Link to="/" className="trangchuls">Trang chủ</Link>
-              <Link to="/print" className="in">In</Link>
-              <Link to="/history" className="xemls">Xem lịch sử in ấn</Link>
+              <Link to="/" className="trangchuls">
+                Trang chủ
+              </Link>
+              <Link to="/print" className="in">
+                In
+              </Link>
+              <Link to="/history" className="xemls">
+                Xem lịch sử in ấn
+              </Link>
             </nav>
           )}
         </nav>
-        <img src={chuong} alt="Tbao" className="Tbao" />
-        <img src={mess} alt="tnhan" className="tnhan" />
-        <button className="setting"></button>
-        <img src={avar} alt="hAnh" className="hAnh" />
+        {isLoggedIn ? (
+          <div className="avatar-link" onClick={toggleAvatarPopup}>
+            <img src={avar} alt="hAnh" className="hAnh" /> {/* Avatar */}
+          </div>
+        ) : (
+          <Link to="/login" className="dangnhap">
+            Đăng nhập
+          </Link>
+        )}
       </header>
-
+      {isAvatarPopupOpen && isLoggedIn && (
+        <div className="avatar-popup">
+          <ul>
+            <li>
+              <Link to="/profile" onClick={toggleAvatarPopup}>
+                Profile
+              </Link>
+            </li>
+            <li onClick={handleLogout}>Log out</li>
+          </ul>
+        </div>
+      )}
       <div className="history-content">
         <h1>Lịch sử in ấn</h1>
         {historyData.length === 0 ? (
@@ -104,7 +139,9 @@ export const PrintHistory = () => {
                   <td>
                     <button
                       className="view-settings-btn"
-                      onClick={() => showPrintSettings(JSON.parse(item.print_settings))}
+                      onClick={() =>
+                        showPrintSettings(JSON.parse(item.print_settings))
+                      }
                     >
                       Xem cài đặt
                     </button>
@@ -124,7 +161,9 @@ export const PrintHistory = () => {
           <div className="popup-content">
             <h2>Cài đặt in chi tiết</h2>
             <pre>{JSON.stringify(selectedPrintSettings, null, 2)}</pre>
-            <button className="close-btn" onClick={togglePopup}>Đóng</button>
+            <button className="close-btn" onClick={togglePopup}>
+              Đóng
+            </button>
           </div>
         </div>
       )}
@@ -132,9 +171,15 @@ export const PrintHistory = () => {
       {isPopupOpen && isMobileView && (
         <div className="popup">
           <ul>
-            <Link to="/" onClick={togglePopup}><li>Trang Chủ</li></Link>
-            <Link to="/print" onClick={togglePopup}><li>In</li></Link>
-            <Link to="/history" onClick={togglePopup}><li>Xem lịch sử in ấn</li></Link>
+            <Link to="/" onClick={togglePopup}>
+              <li>Trang Chủ</li>
+            </Link>
+            <Link to="/print" onClick={togglePopup}>
+              <li>In</li>
+            </Link>
+            <Link to="/history" onClick={togglePopup}>
+              <li>Xem lịch sử in ấn</li>
+            </Link>
           </ul>
         </div>
       )}

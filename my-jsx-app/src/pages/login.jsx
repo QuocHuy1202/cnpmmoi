@@ -2,16 +2,16 @@ import React, { useState } from "react";
 import image from "../image/image.png";
 import { Link, useNavigate } from "react-router-dom";
 import "../css/login.css";
-import { toast, ToastContainer } from "react-toastify";  // Import toast and ToastContainer
+import { toast, ToastContainer } from "react-toastify"; // Import toast and ToastContainer
 
-const backendUrl = "http://localhost:5000";
+const backendUrl = "http://localhost:5001";
 
 export const Login = () => {
   const [email, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const [token, setToken] = useState(""); 
+  const [token, setToken] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -37,7 +37,10 @@ export const Login = () => {
           console.log(data); // Save token in state
           localStorage.setItem("token", data.token); // Store token in localStorage
           localStorage.setItem("status", data.status);
-          localStorage.setItem("number_of_pages_remaining", data.number_of_pages_remaining);
+          localStorage.setItem(
+            "number_of_pages_remaining",
+            data.number_of_pages_remaining
+          );
           toast.success("Đăng nhập thành công!"); // Show success message
           navigate("/"); // Redirect to the home page after login
         } else {

@@ -15,10 +15,10 @@ export const PaymentHistory = () => {
       try {
         const token = localStorage.getItem("token");
 
-        const response = await fetch("http://localhost:5000/payment-history", {
+        const response = await fetch("http://localhost:5001/payment-history", {
           method: "GET",
           headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -51,13 +51,15 @@ export const PaymentHistory = () => {
         <img src={image} alt="Logo" className="logo" />
         <nav className="navbar">
           {isMobileView ? (
-            <button className="menu-button">
-              ☰
-            </button>
+            <button className="menu-button">☰</button>
           ) : (
             <nav className="navbar">
-              <Link to="/" className="trangchuls">Trang chủ</Link>
-              <Link to="/payment-history" className="xemls">Xem lịch sử thanh toán</Link>
+              <Link to="/" className="trangchuls">
+                Trang chủ
+              </Link>
+              <Link to="/payment-history" className="xemls">
+                Xem lịch sử thanh toán
+              </Link>
             </nav>
           )}
         </nav>
@@ -75,7 +77,6 @@ export const PaymentHistory = () => {
           <table className="history-table">
             <thead>
               <tr>
-                
                 <th>Số trang mua</th>
                 <th>Thành tiền</th>
                 <th>Trạng thái</th>
@@ -85,7 +86,6 @@ export const PaymentHistory = () => {
             <tbody>
               {paymentData.map((item) => (
                 <tr key={item.id}>
-                  
                   <td>{item.pages_to_buy}</td>
                   <td>{item.total_amount} VND</td>
                   <td>{item.status}</td>

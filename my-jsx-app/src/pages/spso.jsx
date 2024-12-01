@@ -7,10 +7,10 @@ export const SPSO = () => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/employees')
+    fetch("http://localhost:5001/api/employees")
       .then((response) => response.json())
       .then((data) => setData(data))
-      .catch((error) => console.error('Error:', error));
+      .catch((error) => console.error("Error:", error));
   }, []);
 
   return (
@@ -23,5 +23,3 @@ export const SPSO = () => {
     </div>
   );
 };
-
-
