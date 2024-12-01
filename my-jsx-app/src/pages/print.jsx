@@ -11,7 +11,15 @@ import mayin from "../image/may-in.jpg";
 
 export const Print = () => {
   const [isUploading, setIsUploading] = useState(false);
-
+  const getFileType = (fileName) => {
+    if (!fileName.includes(".")) {
+      return "unknown"; // Không có phần mở rộng
+    }
+  
+    const extension = fileName.split('.').pop().toLowerCase();
+    return extension;
+  };
+  
   const [printSettings, setPrintSettings] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedPrinter, setSelectedPrinter] = useState("");
@@ -63,11 +71,11 @@ export const Print = () => {
       if (response.ok) {
         const result = await response.json();
         alert("Tải lên file thành công: " + result.filePath);
-  
+        console.log(getFileType(file.name));
         // Cập nhật fileDetails với thông tin chi tiết về file
         const fileDetails = {
           name: file.name, // Tên file
-          type: file.type, // Loại file
+          type: getFileType(file.name), // Loại file
           uploadDate: new Date().toISOString(), // Ngày upload (theo định dạng ISO)
           path: result.filePath, // Đường dẫn file (sẽ nhận từ API)
         };
@@ -142,13 +150,21 @@ export const Print = () => {
   // In file
   const handlePrint = async () => {
     const fileToPrint = selectedFile || fileDetails;
-  
+    let status = localStorage.getItem("status");
+    let number_of_pages_remaining = localStorage.getItem("number_of_pages_remaining");
     // Kiểm tra nếu không có file hoặc máy in
     if (!fileToPrint || !selectedPrinter) {
       alert("Vui lòng chọn file và máy in.");
       return;
     }
-  
+  if(status!= "active") {
+    alert("Tài khoản đã bị chặn");
+    return;
+  }
+  if(number_of_pages_remaining<1){
+    alert("Tài khoản đã hết lượt in");
+    return;
+  }
     // Kiểm tra và sử dụng dữ liệu mặc định cho printSettings nếu không có trong localStorage
     const defaultPrintSettings = {
       copies: 1,
@@ -188,7 +204,7 @@ export const Print = () => {
   
         // Xóa dữ liệu trong localStorage sau khi in xong, ngoại trừ token
         Object.keys(localStorage).forEach((key) => {
-          if (key !== "token") {
+          if (key !== "token"&&key!== "status"&&key!=="number_of_pages_remaining") {
             localStorage.removeItem(key);
           }
         });
@@ -198,6 +214,17 @@ export const Print = () => {
         setPrintSettings(null); // Reset print settings state
         setSelectedFile(null);  // Reset selected file state
         setSelectedPrinter(""); // Reset selected printer state
+        number_of_pages_remaining=number_of_pages_remaining-1;
+        console.log(number_of_pages_remaining);
+        localStorage.setItem("number_of_pages_remaining", number_of_pages_remaining);
+        const responset = await fetch("http://localhost:5000/api/account/update-pages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify({number_of_pages_remaining: number_of_pages_remaining}),
+        });
       } else {
         const error = await response.json();
         alert(`Lỗi khi in: ${error.message}`);

@@ -8,7 +8,9 @@ import {PrintPage} from "./pages/printsetting.jsx"
 import {Print} from "./pages/print.jsx"
 import {Homen} from "./pages/home.jsx"
 import {PrintHistory} from "./pages/printhistory.jsx"
-import { Printte } from "./pages/PdfViewer.jsx"
+import {PaymentHistory} from "./pages/paymentlist.jsx"
+import { Payment } from "./pages/payment.jsx"
+import { Profile } from "./pages/profile.jsx"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 function App() {
@@ -18,7 +20,9 @@ function App() {
         
           <Routes>
             <Route path="/" element={<Homen />} />
-            <Route path="/cc" element={<Printte />} />
+            <Route path="/payment" element={<Payment />} />
+            <Route path="/paymentlist" element={<PaymentHistory />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/print" element={<Print />} />
             <Route path="/loadfile" element={<TaiFile />} />
             <Route path="/login" element={<Login />} />

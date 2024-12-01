@@ -55,7 +55,11 @@ app.post("/api/user/login", async (req, res) => {
 
     const token = jwt.sign({ email: user.email }, "jwt_secret_key", { expiresIn: "6h" });
 
-    res.status(200).json({ token });
+    res.status(200).json({
+      token,
+      status: user.status,                    // Trả về trạng thái tài khoản
+      number_of_pages_remaining: user.number_of_pages_remaining  // Trả về số trang còn lại
+    });
   } catch (err) {
     console.error("Error:", err);
     res.status(500).json({ message: "Error during authentication" });
@@ -258,6 +262,91 @@ app.get("/printers", async (req, res) => {
   } catch (err) {
     console.error("Error fetching printers:", err);
     res.status(500).send("Internal Server Error");
+  }
+});
+// Endpoint cập nhật số trang còn lại
+app.post("/api/account/update-pages", verifyToken, async (req, res) => {
+  const { email } = req.user; // Lấy email từ token
+  const { number_of_pages_remaining } = req.body; // Dữ liệu số trang còn lại từ client
+
+  if (number_of_pages_remaining == null || isNaN(number_of_pages_remaining)) {
+    return res.status(400).json({ message: "Invalid remainingPages value." });
+  }
+
+  try {
+    // Kết nối tới cơ sở dữ liệu
+    const pool = await sql.connect(sqlConfig);
+
+    // Cập nhật số trang còn lại
+    const result = await pool.request()
+      .input("email", sql.VarChar, email)
+      .input("number_of_pages_remaining", sql.Int, number_of_pages_remaining)
+      .query(`
+        UPDATE account
+        SET number_of_pages_remaining = @number_of_pages_remaining
+        WHERE email = @email
+      `);
+
+    if (result.rowsAffected[0] === 0) {
+      return res.status(404).json({ message: "Account not found." });
+    }
+
+    res.status(200).json({ message: "Updated remaining pages successfully." });
+  } catch (err) {
+    console.error("Error updating remaining pages:", err);
+    res.status(500).json({ message: "Error updating remaining pages." });
+  }
+});
+app.post("/api/payment", verifyToken, async (req, res) => {
+  const { pagesToBuy, totalAmount, status } = req.body;
+  const { email } = req.user; // Email từ token đã giải mã
+
+  try {
+    // Lưu thông tin thanh toán vào cơ sở dữ liệu
+    const pool = await sql.connect(sqlConfig);
+    await pool.request()
+      .input("email", sql.VarChar, email)
+      .input("pagesToBuy", sql.Int, pagesToBuy)
+      .input("totalAmount", sql.Int, totalAmount)
+      .input("status", sql.VarChar, status)
+      .query(`
+        INSERT INTO payments (email, pages_to_buy, total_amount, status)
+        VALUES (@email, @pagesToBuy, @totalAmount, @status)
+      `);
+
+    // Trả về thông báo thanh toán thành công
+    res.status(200).json({ message: "Yêu cầu thành công, vui lòng lên BKPay để thanh toán." });
+  } catch (err) {
+    console.error("Lỗi khi xử lý thanh toán:", err);
+    res.status(500).json({ message: "Lỗi trong quá trình thanh toán. Vui lòng thử lại." });
+  }
+});
+app.get("/payment-history", verifyToken, async (req, res) => {
+  const { email } = req.user;  // Lấy thông tin email từ token
+
+  try {
+    // Kết nối với cơ sở dữ liệu
+    const pool = await sql.connect(sqlConfig);
+
+    // Truy vấn lịch sử in của người dùng theo email
+    const result = await pool.request()
+      .input("email", sql.VarChar, email)
+      .query(`
+        SELECT pages_to_buy, total_amount, status, created_at
+        FROM payments
+        WHERE email = @email
+        ORDER BY created_at DESC
+      `);
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ message: "Không tìm thấy." });
+    }
+
+    // Trả về danh sách lịch sử in
+    res.status(200).json({ payments: result.recordset });
+  } catch (err) {
+    console.error("Lỗi :", err);
+    res.status(500).json({ message: "Lỗi." });
   }
 });
 // Start server

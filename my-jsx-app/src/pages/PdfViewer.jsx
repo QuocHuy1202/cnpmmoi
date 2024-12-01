@@ -1,68 +1,108 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as pdfjsLib from "pdfjs-dist/webpack";
+import mammoth from "mammoth";
 
 const PdfViewer = () => {
-  const [isRendering, setIsRendering] = useState(false); // Trạng thái render
-  const [numPages, setNumPages] = useState(0); // Số trang của PDF
-  const containerRef = useRef(null); // Ref cho container chứa các trang
+  const [isRendering, setIsRendering] = useState(false);
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    const loadPdf = async () => {
-      setIsRendering(true); // Bắt đầu render
+    const loadFile = async () => {
+      setIsRendering(true);
 
       try {
-        // Lấy file_path từ localStorage
         const storedFile = JSON.parse(localStorage.getItem("selectedFile"));
+        const filePath = storedFile?.path;
         console.log(storedFile);
-        const pdfUrl = storedFile?.path;
-
-        if (!pdfUrl) {
+        if (!filePath) {
           throw new Error("Không tìm thấy file_path trong localStorage.");
         }
 
-        const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
-        setNumPages(pdf.numPages); // Lấy số trang PDF
+        const fileType = storedFile?.type;
 
-        // Render từng trang
-        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-          const page = await pdf.getPage(pageNum); // Lấy trang
-          const scale = 1.5; // Độ phóng đại
-          const viewport = page.getViewport({ scale });
+        containerRef.current.innerHTML = ""; // Clear container
 
-          const canvas = document.createElement("canvas"); // Tạo canvas cho mỗi trang
-          const context = canvas.getContext("2d");
-
-          canvas.height = viewport.height;
-          canvas.width = viewport.width;
-
-          // Thêm canvas vào container
-          containerRef.current.appendChild(canvas);
-
-          // Render trang vào canvas
-          await page.render({
-            canvasContext: context,
-            viewport: viewport,
-          }).promise;
+        switch (fileType) {
+          case "pdf":
+            await renderPdf(filePath, containerRef);
+            break;
+          case "docx":
+            await renderDocx(filePath, containerRef);
+            break;
+          case "jpg":
+          case "png":
+            renderImage(filePath, containerRef);
+            break;
+          default:
+            throw new Error(`Không hỗ trợ loại tệp: ${fileType}`);
         }
       } catch (error) {
-        console.error("Render error:", error);
+        console.error("Error loading file:", error);
       } finally {
-        setIsRendering(false); // Đánh dấu render xong
+        setIsRendering(false);
       }
     };
 
-    loadPdf(); // Gọi hàm loadPdf khi component mount
-  }, []); // Chỉ chạy một lần khi component mount
+    loadFile();
+  }, []);
 
   return (
     <div>
-      {/* Hiển thị thông báo khi đang render */}
-      {isRendering && <div>Rendering PDF...</div>}
-      
-      {/* Container chứa các trang PDF */}
+      {isRendering && <div>Rendering file...</div>}
       <div ref={containerRef} style={{ overflowY: "auto", height: "600px" }}></div>
     </div>
   );
+};
+
+const getFileType = (filePath) => {
+  return filePath?.split(".").pop().toLowerCase();
+};
+
+const renderPdf = async (filePath, containerRef) => {
+  const pdf = await pdfjsLib.getDocument(filePath).promise;
+
+  for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+    const page = await pdf.getPage(pageNum);
+    const scale = 1.5;
+    const viewport = page.getViewport({ scale });
+
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    containerRef.current.appendChild(canvas);
+
+    await page.render({
+      canvasContext: context,
+      viewport: viewport,
+    }).promise;
+  }
+};
+
+const renderDocx = async (filePath, containerRef) => {
+  try {
+    const response = await fetch(filePath);
+    const arrayBuffer = await response.arrayBuffer();
+
+    const result = await mammoth.extractRawText({ arrayBuffer });
+    const content = document.createElement("div");
+    content.innerText = result.value;
+    containerRef.current.appendChild(content);
+  } catch (error) {
+    console.error("Error rendering DOCX:", error);
+  }
+};
+
+const renderImage = (filePath, containerRef) => {
+  const img = document.createElement("img");
+  img.src = filePath;
+  img.alt = "Document Image";
+  img.style.maxWidth = "100%";
+  img.style.height = "auto";
+
+  containerRef.current.appendChild(img);
 };
 
 export const Printte = () => {

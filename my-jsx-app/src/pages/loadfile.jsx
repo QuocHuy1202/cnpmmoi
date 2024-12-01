@@ -86,7 +86,7 @@ export const TaiFile = () => {
           data.files.map((file) => ({
             
             name: file.file_name,
-            size: file.file_type,
+            type: file.file_type,
             date: file.uploaded_at,
             path: file.file_path, // Thêm đường dẫn để có thể tải về hoặc hiển thị
           }

@@ -34,9 +34,10 @@ export const Login = () => {
           // Successful login
           const data = await response.json();
           setToken(data.token);
-          console.log(data.token); // Save token in state
+          console.log(data); // Save token in state
           localStorage.setItem("token", data.token); // Store token in localStorage
-          
+          localStorage.setItem("status", data.status);
+          localStorage.setItem("number_of_pages_remaining", data.number_of_pages_remaining);
           toast.success("Đăng nhập thành công!"); // Show success message
           navigate("/"); // Redirect to the home page after login
         } else {

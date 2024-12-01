@@ -28,7 +28,9 @@ export const Homen = () => {
 
   // Function to handle logout
   const handleLogout = () => {
-    localStorage.removeItem("token");  // Remove token from localStorage
+    localStorage.clear();  // Xóa tất cả các mục trong localStorage
+    
+    // Remove token from localStorage
     setIsLoggedIn(false);  // Update the logged-in status
     navigate("/login");  // Redirect user to the login page
   };
