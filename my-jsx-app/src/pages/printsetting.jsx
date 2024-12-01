@@ -14,7 +14,7 @@ export const PrintPage = () => {
   const navigate = useNavigate();
   const handlePrint = () => {
     // In thực tế cần logic để gửi thông tin đến máy in
-    console.log({
+    const printSettings = {
       copies,
       orientation,
       pageSize,
@@ -23,7 +23,8 @@ export const PrintPage = () => {
       duplex,
       margin,
       pagesPerSheet,
-    });
+    };
+    localStorage.setItem("printSettings", JSON.stringify(printSettings));
     navigate("/print")
   };
   const handleCancel = () => {

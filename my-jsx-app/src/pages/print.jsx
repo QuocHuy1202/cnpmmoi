@@ -10,7 +10,9 @@ import avar from "../image/avar.svg";
 import mayin from "../image/may-in.jpg";
 
 export const Print = () => {
+  const [printSettings, setPrintSettings] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [fileDetails, setFileDetails] = useState("");
   const [printer, setPrinter] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,6 +34,19 @@ export const Print = () => {
     navigate("/"); // Navigate to the homepage
   };
   useEffect(() => {
+    // Lấy thông tin từ localStorage
+    const settings = localStorage.getItem("printSettings");
+    if (settings) {
+      setPrintSettings(JSON.parse(settings));
+    }
+  }, []);
+  useEffect(() => {
+    const storedFile = localStorage.getItem("selectedFile");
+    if (storedFile) {
+      setFileDetails(JSON.parse(storedFile)); // Parse dữ liệu từ localStorage
+    }
+  }, []);
+  useEffect(() => {
     const handleResize = () => setIsMobileView(window.innerWidth <= 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -45,15 +60,67 @@ export const Print = () => {
   };
 
   // In file
-  const handlePrint = () => {
-    const fileToPrint = selectedFile || selectedFileFromList; // Kiểm tra file nào có trước
-
+  const handlePrint = async () => {
+    const fileToPrint = selectedFile || fileDetails;
+  
+    // Kiểm tra nếu không có file hoặc máy in
     if (!fileToPrint || !printer) {
       alert("Vui lòng chọn file và máy in.");
       return;
     }
-
-    alert(`Đang in file ${fileToPrint.name || fileToPrint} trên máy ${printer}`);
+  
+    // Kiểm tra và sử dụng dữ liệu mặc định cho printSettings nếu không có trong localStorage
+    const defaultPrintSettings = {
+      copies: 1,
+      orientation: "Portrait",
+      pageSize: "A4",
+      pageRange: "all",
+      customPages: "",
+      duplex: "No",
+      margin: "Narrow",
+      pagesPerSheet: 1,
+    };
+    
+    const settingsToUse = printSettings || defaultPrintSettings;
+  
+    // Tạo payload để gửi
+    const payload = {
+      fileDetails: fileDetails || { name: fileToPrint.name }, // Thông tin file
+      printSettings: settingsToUse, // Thông tin cài đặt in
+      printer: printer, // Máy in đã chọn
+    };
+  
+    try {
+      // Gửi dữ liệu tới server
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:5000/print", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        alert(`In thành công: ${result.message}`);
+        
+        // Xóa dữ liệu trong localStorage sau khi in xong
+        localStorage.removeItem("fileDetails");
+        localStorage.removeItem("printSettings");
+  
+        // Cập nhật lại state
+        setFileDetails("");
+        setPrintSettings(null);
+      } else {
+        const error = await response.json();
+        alert(`Lỗi khi in: ${error.message}`);
+      }
+    } catch (err) {
+      console.error("Lỗi khi gửi yêu cầu in:", err);
+      alert("Không thể gửi yêu cầu in. Vui lòng thử lại.");
+    }
   };
 
   // Điều hướng đến trang thiết lập in
@@ -62,6 +129,7 @@ export const Print = () => {
   };
 
   return (
+    
     <div className="app">
       {/* Header chứa logo và điều hướng */}
       <header className="header">
@@ -106,8 +174,8 @@ export const Print = () => {
           <p className="notif">
             {selectedFile
               ? `File tải lên: ${selectedFile.name}`
-              : selectedFileFromList
-              ? `File từ tài khoản: ${selectedFileFromList}`
+              : fileDetails
+              ? `File từ tài khoản: ${fileDetails.name}`
               : "Chưa có file nào"}
           </p>
           {/* Hiển thị nút "Thiết lập trang in" khi có file tải lên */}

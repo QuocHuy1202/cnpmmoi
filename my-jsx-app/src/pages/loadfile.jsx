@@ -44,8 +44,13 @@ export const TaiFile = () => {
     }
   };
   const handleSelectFileFromList = (fileName) => {
-    setSelectedFileFromList(fileName); // Lưu tên file
+    const selectedFile = files.find((file) => file.name === fileName);
+    if (selectedFile) {
+      localStorage.setItem("selectedFile", JSON.stringify(selectedFile)); // Lưu thông tin file vào localStorage
+      setSelectedFileFromList(fileName); // Lưu tên file
+    }
   };
+  
   useEffect(() => {
     // Gọi handleGoPrint ngay sau khi selectedFileFromList thay đổi
     if (selectedFileFromList) {
@@ -61,6 +66,39 @@ export const TaiFile = () => {
   const togglePopup = () => {
     setIsPopupOpen(!isPopupOpen);
   };
+  useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/files", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Đặt token ở đây
+          },
+        });
+  
+        if (!response.ok) {
+          throw new Error("Failed to fetch files");
+        }
+  
+        const data = await response.json();
+        console.log(data);
+        setFiles(
+          data.files.map((file) => ({
+            
+            name: file.file_name,
+            size: file.file_type,
+            date: file.uploaded_at,
+            path: file.file_path, // Thêm đường dẫn để có thể tải về hoặc hiển thị
+          }
+        ))
+        );
+      } catch (error) {
+        console.error("Error fetching files:", error);
+      }
+    };
+  
+    fetchFiles();
+  }, []);
   return (
     <div className="app">
       {/* Header chứa logo và thanh điều hướng */}
@@ -99,50 +137,28 @@ export const TaiFile = () => {
             <thead>
               <tr>
                 <th>Tên file</th>
-                <th>Kích thước</th>
+                <th>Loại file</th>
                 <th>Ngày tải</th>
                 <th> </th>
               </tr>
             </thead>
             <tbody>
-              {/* Danh sách mẫu */}
-              {[
-                { name: "file1.doc", size: "123 KB", date: "1 / 2/ 2024" },
-                { name: "file2.doc", size: "234 KB", date: "12 / 3/ 2024" },
-                { name: "file3.doc", size: "279 KB", date: "18 / 3/ 2024" },
-                { name: "file4.doc", size: "567 KB", date: "12 / 3/ 2024" },
-              ].map((file, index) => (
-                <tr key={index}>
-                  <td>{file.name}</td>
-                  <td>{file.size}</td>
-                  <td>{file.date}</td>
-                  <td>
-                    <button
-                      onClick={() => handleSelectFileFromList(file.name)}
-                      className="select-btn"
-                    >
-                      Chọn
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {/* Danh sách file người dùng tải lên */}
-              {files.map((file, index) => (
-                <tr key={index}>
-                  <td>{file.name}</td>
-                  <td>{file.size}</td>
-                  <td>{file.date}</td>
-                  <td>
-                    <button
-                      onClick={() => handleSelectFileFromList(file.name)}
-                      className="select-btn"
-                    >
-                      Chọn
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+  {files.map((file, index) => (
+    <tr key={index}>
+      <td>{file.name}</td>
+      <td>{file.size}</td>
+      <td>{file.date}</td>
+      <td>
+        <button
+          onClick={() => handleSelectFileFromList(file.name)}
+          className="select-btn"
+        >
+          Chọn
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
           </table>
           {/* <div className="selected-file-display">
             <h3 className="tieude">File đã chọn:</h3>

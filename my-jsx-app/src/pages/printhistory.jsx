@@ -10,17 +10,37 @@ export const PrintHistory = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
   const [historyData, setHistoryData] = useState([]);
+  const [selectedPrintSettings, setSelectedPrintSettings] = useState(null); // Lưu cài đặt in đã chọn
 
-  // Giả sử bạn có API trả về lịch sử in ấn
   useEffect(() => {
-    // Thay thế bằng API thực tế để lấy lịch sử in ấn
-    fetch("/api/print-history")
-      .then(response => response.json())
-      .then(data => setHistoryData(data))
-      .catch(error => console.error("Error fetching print history:", error));
+    const fetchPrintHistory = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const response = await fetch("http://localhost:5000/history", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log("Lịch sử in:", result.history);
+          setHistoryData(result.history); // Lưu dữ liệu vào state
+        } else {
+          const error = await response.json();
+          alert(`Lỗi khi lấy lịch sử in: ${error.message}`);
+        }
+      } catch (err) {
+        console.error("Lỗi khi lấy lịch sử in:", err);
+        alert("Không thể lấy lịch sử in. Vui lòng thử lại.");
+      }
+    };
+
+    fetchPrintHistory(); // Gọi API khi component được mount
   }, []);
 
-  // Xử lý thay đổi kích thước màn hình
   useEffect(() => {
     const handleResize = () => setIsMobileView(window.innerWidth <= 768);
     window.addEventListener("resize", handleResize);
@@ -31,9 +51,13 @@ export const PrintHistory = () => {
     setIsPopupOpen(!isPopupOpen);
   };
 
+  const showPrintSettings = (settings) => {
+    setSelectedPrintSettings(settings); // Cập nhật cài đặt in đã chọn
+    togglePopup(); // Mở popup
+  };
+
   return (
     <div className="app">
-      {/* Header chứa logo và điều hướng */}
       <header className="header">
         <img src={image} alt="Logo" className="logo" />
         <nav className="navbar">
@@ -49,13 +73,12 @@ export const PrintHistory = () => {
             </nav>
           )}
         </nav>
-        <img src={chuong} alt="Tbao" className="Tbao" /> {/* CHuong*/}
-        <img src={mess} alt="tnhan" className="tnhan" /> {/* hop thoại */}
+        <img src={chuong} alt="Tbao" className="Tbao" />
+        <img src={mess} alt="tnhan" className="tnhan" />
         <button className="setting"></button>
-        <img src={avar} alt="hAnh" className="hAnh" /> {/* avarta */}
+        <img src={avar} alt="hAnh" className="hAnh" />
       </header>
 
-      {/* Nội dung trang: Bảng lịch sử in ấn */}
       <div className="history-content">
         <h1>Lịch sử in ấn</h1>
         {historyData.length === 0 ? (
@@ -65,20 +88,29 @@ export const PrintHistory = () => {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Ngày</th>
-                <th>Tên người dùng</th>
-                <th>Số lượng trang</th>
+                <th>Tên file</th>
+                <th>Máy in</th>
+                <th>Cài đặt in</th>
                 <th>Trạng thái</th>
+                <th>Ngày</th>
               </tr>
             </thead>
             <tbody>
               {historyData.map((item) => (
                 <tr key={item.id}>
                   <td>{item.id}</td>
-                  <td>{item.date}</td>
-                  <td>{item.username}</td>
-                  <td>{item.pageCount}</td>
+                  <td>{item.file_name}</td>
+                  <td>{item.printer}</td>
+                  <td>
+                    <button
+                      className="view-settings-btn"
+                      onClick={() => showPrintSettings(JSON.parse(item.print_settings))}
+                    >
+                      Xem cài đặt
+                    </button>
+                  </td>
                   <td>{item.status}</td>
+                  <td>{new Date(item.created_at).toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>
@@ -86,7 +118,17 @@ export const PrintHistory = () => {
         )}
       </div>
 
-      {/* Popup menu cho thiết bị di động */}
+      {/* Popup hiển thị cài đặt in */}
+      {isPopupOpen && selectedPrintSettings && (
+        <div className="settings-popup">
+          <div className="popup-content">
+            <h2>Cài đặt in chi tiết</h2>
+            <pre>{JSON.stringify(selectedPrintSettings, null, 2)}</pre>
+            <button className="close-btn" onClick={togglePopup}>Đóng</button>
+          </div>
+        </div>
+      )}
+
       {isPopupOpen && isMobileView && (
         <div className="popup">
           <ul>

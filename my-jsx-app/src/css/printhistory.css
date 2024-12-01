@@ -222,3 +222,106 @@ a {
 .trangchu-bot:hover, .in-bot.active:hover, .xem-bot:hover, .dang-nhap:hover {
   text-decoration: none; /* Loại bỏ dấu gạch chân khi hover */
 }
+.history-content {
+  margin: 20px;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.history-content h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.history-table th,
+.history-table td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.history-table th {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.history-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.history-table tbody tr:hover {
+  background-color: #e1f7d5;
+  cursor: pointer;
+}
+
+.history-table td {
+  font-size: 14px;
+}
+.view-settings-btn {
+  padding: 5px 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.view-settings-btn:hover {
+  background-color: #45a049;
+}
+
+/* Popup hiển thị cài đặt in */
+.settings-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.popup-content h2 {
+  margin-bottom: 15px;
+}
+
+.popup-content pre {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 5px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.close-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+
+.close-btn:hover {
+  background-color: #e53935;
+}

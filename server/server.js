@@ -53,7 +53,7 @@ app.post("/api/user/login", async (req, res) => {
       return res.status(400).json({ message: "Email or password is incorrect" });
     }
 
-    const token = jwt.sign({ email: user.email }, "jwt_secret_key", { expiresIn: "1h" });
+    const token = jwt.sign({ email: user.email }, "jwt_secret_key", { expiresIn: "6h" });
 
     res.status(200).json({ token });
   } catch (err) {
@@ -112,13 +112,21 @@ app.post("/api/upload", upload.single("file"), async (req, res) => {
   }
 });
 
-app.get("/api/files/:email", async (req, res) => {
-  const { email } = req.params;
+app.get("/api/files", async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1]; // Lấy token từ header Authorization
+
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized: No token provided" });
+  }
 
   try {
+    // Giải mã token
+    const decoded = jwt.verify(token, "jwt_secret_key");
+    const email = decoded.email;
+
     const pool = await sql.connect(sqlConfig);
-    
-    // Truy vấn cơ sở dữ liệu để lấy thông tin các tệp của email
+
+    // Lấy danh sách file theo email
     const result = await pool.request()
       .input("email", sql.VarChar, email)
       .query("SELECT * FROM files WHERE email = @email");
@@ -127,48 +135,112 @@ app.get("/api/files/:email", async (req, res) => {
       return res.status(404).json({ message: "No files found for this email." });
     }
 
-    // Trả về danh sách các tệp
-    const files = await Promise.all(result.recordset.map(async (file) => {
-      const filePath = file.file_path;
-
-      // Trích xuất public_id từ URL của file_path
-      const urlParts = filePath.split('/');
-      const public_id = urlParts[urlParts.length - 1].split('.')[0]; // Lấy phần public_id từ URL
-
-      // Lấy thông tin ảnh từ Cloudinary bằng public_id
-      const cloudinaryResult = await new Promise((resolve, reject) => {
-        cloudinary.api.resource(public_id, function(error, result) {
-          if (error) {
-            reject(error); // Nếu có lỗi thì reject
-          } else {
-            resolve(result); // Nếu thành công thì resolve với kết quả
-          }
-        });
-      });
-
-      return {
-        fileName: file.file_name,
-        filePath: cloudinaryResult.secure_url, // Lấy URL từ Cloudinary
-        fileType: file.file_type,
-      };
-    }));
-
-    res.status(200).json({ files });
+    // Trả danh sách file
+    res.status(200).json({ files: result.recordset });
   } catch (err) {
     console.error("Error:", err);
+    if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
     res.status(500).json({ message: "Error fetching files." });
   }
 });
-const publicId = 'your_pdf_public_id';  // Thay bằng public ID của tệp PDF bạn muốn lấy URL
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1]; // Lấy token từ header Authorization
 
-// Tạo Signed URL
-const signedUrl = cloudinary.url(publicId, {
-  resource_type: 'raw', // Đối với tài nguyên không phải hình ảnh (như PDF)
-  sign_url: true,       // Yêu cầu Cloudinary tạo chữ ký cho URL
-  expiration: 3600      // Thời gian hết hạn của URL (1 giờ ở đây, có thể thay đổi)
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized: No token provided" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, "jwt_secret_key"); // Giải mã token
+    req.user = decoded; // Lưu thông tin người dùng vào request
+    next(); // Tiến hành với middleware tiếp theo
+  } catch (err) {
+    console.error("Token error:", err);
+    return res.status(401).json({ message: "Unauthorized: Invalid or expired token" });
+  }
+};
+
+// Endpoint xử lý in
+app.post("/print", verifyToken, async (req, res) => {
+  const { fileDetails, printSettings, printer } = req.body;
+  const { email } = req.user;  // Lấy thông tin email từ token
+
+  // Kiểm tra xem dữ liệu có đầy đủ không
+  if (!fileDetails || !fileDetails.name || !printer || !printSettings) {
+    return res.status(400).json({ message: "Thông tin in không đầy đủ. Vui lòng kiểm tra lại." });
+  }
+
+  // Tạo dữ liệu yêu cầu in
+  const requestPayload = {
+    email,
+    fileName: fileDetails.name,
+    printer,
+    printSettings: JSON.stringify(printSettings),  // Lưu cài đặt in dưới dạng chuỗi JSON
+    status: "Completed",
+  };
+
+  try {
+    // Kết nối với cơ sở dữ liệu
+    const pool = await sql.connect(sqlConfig);
+
+    // Lưu thông tin yêu cầu in vào cơ sở dữ liệu
+    const result = await pool.request()
+      .input("email", sql.VarChar, requestPayload.email)
+      .input("fileName", sql.VarChar, requestPayload.fileName)
+      .input("printer", sql.VarChar, requestPayload.printer)
+      .input("printSettings", sql.NVarChar, requestPayload.printSettings)
+      .input("status", sql.VarChar, requestPayload.status)
+      .query(`
+        INSERT INTO print_requests (email, file_name, printer, print_settings, status)
+        VALUES (@email, @fileName, @printer, @printSettings, @status)
+      `);
+
+    // Giả lập quá trình in
+    console.log("Đang xử lý in...");
+    console.log("In file:", fileDetails.name);
+    console.log("Máy in:", printer);
+    console.log("Cài đặt in:", printSettings);
+
+    // Trả về thông báo thành công
+    res.status(200).json({ message: "In thành công!" });
+    
+    // Nếu bạn muốn thực hiện thêm các công việc khác sau khi in, bạn có thể xử lý ở đây
+
+  } catch (err) {
+    console.error("Lỗi khi xử lý yêu cầu in:", err);
+    res.status(500).json({ message: "Lỗi trong quá trình in. Vui lòng thử lại." });
+  }
 });
+app.get("/history", verifyToken, async (req, res) => {
+  const { email } = req.user;  // Lấy thông tin email từ token
 
-console.log('Signed URL:', signedUrl);
+  try {
+    // Kết nối với cơ sở dữ liệu
+    const pool = await sql.connect(sqlConfig);
+
+    // Truy vấn lịch sử in của người dùng theo email
+    const result = await pool.request()
+      .input("email", sql.VarChar, email)
+      .query(`
+        SELECT id, file_name, printer, print_settings, status, created_at
+        FROM print_requests
+        WHERE email = @email
+        ORDER BY created_at DESC
+      `);
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ message: "Không tìm thấy lịch sử in." });
+    }
+
+    // Trả về danh sách lịch sử in
+    res.status(200).json({ history: result.recordset });
+  } catch (err) {
+    console.error("Lỗi khi lấy lịch sử in:", err);
+    res.status(500).json({ message: "Lỗi khi lấy lịch sử in." });
+  }
+});
 // Start server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
