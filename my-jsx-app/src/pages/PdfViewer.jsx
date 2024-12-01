@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as pdfjsLib from "pdfjs-dist/webpack";
 
-const PdfViewer = ({ pdfUrl }) => {
+const PdfViewer = () => {
   const [isRendering, setIsRendering] = useState(false); // Trạng thái render
   const [numPages, setNumPages] = useState(0); // Số trang của PDF
   const containerRef = useRef(null); // Ref cho container chứa các trang
@@ -11,11 +11,20 @@ const PdfViewer = ({ pdfUrl }) => {
       setIsRendering(true); // Bắt đầu render
 
       try {
+        // Lấy file_path từ localStorage
+        const storedFile = JSON.parse(localStorage.getItem("selectedFile"));
+        console.log(storedFile);
+        const pdfUrl = storedFile?.path;
+
+        if (!pdfUrl) {
+          throw new Error("Không tìm thấy file_path trong localStorage.");
+        }
+
         const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
         setNumPages(pdf.numPages); // Lấy số trang PDF
 
         // Render từng trang
-        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
           const page = await pdf.getPage(pageNum); // Lấy trang
           const scale = 1.5; // Độ phóng đại
           const viewport = page.getViewport({ scale });
@@ -42,8 +51,8 @@ const PdfViewer = ({ pdfUrl }) => {
       }
     };
 
-    loadPdf(); // Gọi hàm loadPdf khi pdfUrl thay đổi
-  }, [pdfUrl, numPages]); // Chạy lại khi pdfUrl hoặc numPages thay đổi
+    loadPdf(); // Gọi hàm loadPdf khi component mount
+  }, []); // Chỉ chạy một lần khi component mount
 
   return (
     <div>
@@ -59,7 +68,7 @@ const PdfViewer = ({ pdfUrl }) => {
 export const Printte = () => {
   return (
     <div>
-      <PdfViewer pdfUrl="https://res.cloudinary.com/dzaaf6exo/image/upload/v1732980102/adxplfmxtsud5dgwk8yy.pdf" />
+      <PdfViewer />
     </div>
   );
 };

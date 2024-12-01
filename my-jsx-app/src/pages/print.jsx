@@ -267,7 +267,7 @@ export const Print = () => {
               : "Chưa có file nào"}
           </p>
           {/* Hiển thị nút "Thiết lập trang in" khi có file tải lên */}
-          {(selectedFile||selectedFileFromList) && (
+          {(fileDetails) && (
               <button className="print-setting-btn" onClick={handleGoToPrintSetting}>
                 Thiết lập trang in
               </button>
