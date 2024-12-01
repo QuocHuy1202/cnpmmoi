@@ -10,8 +10,12 @@ import avar from "../image/avar.svg";
 import mayin from "../image/may-in.jpg";
 
 export const Print = () => {
+  const [isUploading, setIsUploading] = useState(false);
+
   const [printSettings, setPrintSettings] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedPrinter, setSelectedPrinter] = useState("");
+  const [printers, setPrinters] = useState([]); // Lưu danh sách máy in từ API
   const [fileDetails, setFileDetails] = useState("");
   const [printer, setPrinter] = useState("");
   const navigate = useNavigate();
@@ -23,12 +27,75 @@ export const Print = () => {
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
   };
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+    
+    if (!file) {
+      alert("Vui lòng chọn một file để tải lên.");
+      return;
+    }
+  
+    const token = localStorage.getItem("token"); // Lấy token từ localStorage
+  
+    if (!token) {
+      alert("Bạn cần đăng nhập để tải lên file.");
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append("file", file);
+  
+    // Bắt đầu tải file, hiển thị thông báo
+    setIsUploading(true);
+    
 
-  // Hàm xử lý chọn máy in
-  const handlePrinterChange = (event) => {
-    setPrinter(event.target.value);
+  
+    try {
+      const response = await fetch("http://localhost:5000/api/upload", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`, // Gửi token trong header Authorization
+        },
+        body: formData,
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        alert("Tải lên file thành công: " + result.filePath);
+  
+        // Cập nhật fileDetails với thông tin chi tiết về file
+        const fileDetails = {
+          name: file.name, // Tên file
+          type: file.type, // Loại file
+          uploadDate: new Date().toISOString(), // Ngày upload (theo định dạng ISO)
+          path: result.filePath, // Đường dẫn file (sẽ nhận từ API)
+        };
+  
+        setFileDetails(fileDetails); // Lưu thông tin vào state
+        localStorage.setItem("selectedFile", JSON.stringify(fileDetails)); // Lưu vào localStorage nếu cần
+      } else {
+        const error = await response.json();
+        alert("Lỗi khi tải file lên: " + error.message);
+      }
+    } catch (error) {
+      console.error("Lỗi khi tải file lên:", error);
+      alert("Có lỗi xảy ra khi tải file lên.");
+    } finally {
+      // Kết thúc tải file, ẩn thông báo
+      setIsUploading(false);
+    }
   };
+  
+  
+  // Hàm xử lý chọn máy in
 
+  const handlePrinterChange = (event) => {
+    const selectedPrinter = event.target.value;
+    setSelectedPrinter(selectedPrinter);
+
+    // Lưu máy in đã chọn vào localStorage
+  };
   // Điều hướng về trang chủ
   const handleGoHome = () => {
     navigate("/"); // Navigate to the homepage
@@ -58,13 +125,26 @@ export const Print = () => {
   const handleGoloadfile = () => {
     navigate("/loadfile", { state: { selectedFileFromList } });
   };
-
+  useEffect(() => {
+    // Gọi API để lấy danh sách máy in
+    const fetchPrinters = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/printers");
+        const data = await response.json();
+        setPrinters(data); // Cập nhật danh sách máy in
+      } catch (error) {
+        console.error("Error fetching printers:", error);
+      }
+    };
+  
+    fetchPrinters();
+  }, []); // Chỉ chạy một lần khi component mount
   // In file
   const handlePrint = async () => {
     const fileToPrint = selectedFile || fileDetails;
   
     // Kiểm tra nếu không có file hoặc máy in
-    if (!fileToPrint || !printer) {
+    if (!fileToPrint || !selectedPrinter) {
       alert("Vui lòng chọn file và máy in.");
       return;
     }
@@ -80,14 +160,14 @@ export const Print = () => {
       margin: "Narrow",
       pagesPerSheet: 1,
     };
-    
+  
     const settingsToUse = printSettings || defaultPrintSettings;
   
     // Tạo payload để gửi
     const payload = {
-      fileDetails: fileDetails || { name: fileToPrint.name }, // Thông tin file
+      fileDetails: fileDetails||selectedFile, // Thông tin file
       printSettings: settingsToUse, // Thông tin cài đặt in
-      printer: printer, // Máy in đã chọn
+      printer: selectedPrinter, // Máy in đã chọn
     };
   
     try {
@@ -97,7 +177,7 @@ export const Print = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
@@ -105,14 +185,19 @@ export const Print = () => {
       if (response.ok) {
         const result = await response.json();
         alert(`In thành công: ${result.message}`);
-        
-        // Xóa dữ liệu trong localStorage sau khi in xong
-        localStorage.removeItem("fileDetails");
-        localStorage.removeItem("printSettings");
+  
+        // Xóa dữ liệu trong localStorage sau khi in xong, ngoại trừ token
+        Object.keys(localStorage).forEach((key) => {
+          if (key !== "token") {
+            localStorage.removeItem(key);
+          }
+        });
   
         // Cập nhật lại state
-        setFileDetails("");
-        setPrintSettings(null);
+        setFileDetails(null);  // Reset file details state
+        setPrintSettings(null); // Reset print settings state
+        setSelectedFile(null);  // Reset selected file state
+        setSelectedPrinter(""); // Reset selected printer state
       } else {
         const error = await response.json();
         alert(`Lỗi khi in: ${error.message}`);
@@ -122,6 +207,7 @@ export const Print = () => {
       alert("Không thể gửi yêu cầu in. Vui lòng thử lại.");
     }
   };
+  
 
   // Điều hướng đến trang thiết lập in
   const handleGoToPrintSetting = () => {
@@ -163,18 +249,20 @@ export const Print = () => {
             {/* Nút In (active) */}
             <button className="upload-btn">
               <label htmlFor="file-upload">Tải lên</label>
+              <div className="upload-notification">
+                  {isUploading && <p>Đang tải lên, vui lòng đợi...</p>}
+              </div>
               <input
                 id="file-upload"
                 type="file"
-                onChange={handleFileChange}
+                onChange={handleFileUpload}
                 style={{ display: "none" }}
               />
             </button>
           </div>
           <p className="notif">
-            {selectedFile
-              ? `File tải lên: ${selectedFile.name}`
-              : fileDetails
+            {
+              fileDetails
               ? `File từ tài khoản: ${fileDetails.name}`
               : "Chưa có file nào"}
           </p>
@@ -186,16 +274,25 @@ export const Print = () => {
             )}
           <div className="body">
             <div className="printer-select">
-              <label className="chonmayin">Chọn máy in</label>
+            <label className="chonmayin">Chọn máy in</label>
               <select
+                id="printer-select"
                 className="option"
-                value={printer}
+                value={selectedPrinter}
                 onChange={handlePrinterChange}
               >
                 <option value="">Chọn máy in</option>
-                <option value="Printer 1">Printer 1</option>
-                <option value="Printer 2">Printer 2</option>
+                {/* Hiển thị danh sách máy in từ API */}
+                {printers.map((printer) => (
+                  <option key={printer.printer_ID} value={printer.printer_ID}>
+                    {printer.brand} {printer.model} ({printer.location})
+                  </option>
+                ))}
               </select>
+              {selectedPrinter && (
+                <p>
+                  Bạn đã chọn máy in với ID: <strong>{selectedPrinter}</strong>
+                </p>)}
             </div>
             <button className="print-btn" onClick={handlePrint}>
               <span>🖨️</span> In

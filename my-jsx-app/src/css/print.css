@@ -146,6 +146,13 @@ body {
     background-color: #f5f5f5;         
     margin-left: 20px;
   }
+  .upload-btn label {
+  display: block;  /* Làm cho label chiếm toàn bộ diện tích của nút */
+  width: 100%;  /* Đảm bảo label chiếm toàn bộ chiều rộng */
+  height: 100%;  /* Đảm bảo label chiếm toàn bộ chiều cao */
+  text-align: center; /* Tùy chọn: căn giữa chữ trong label */
+  cursor: pointer;
+}
   
 }
 .groupfield{
@@ -186,9 +193,12 @@ body {
     background-color: #e2e2e2; /* Màu nền khi hover */
 }
 .upload-btn label {
-    right: 40px;
-    
-    cursor: pointer;
+  display: inline-flex;  /* Đảm bảo label là một khối dòng và có thể sử dụng flexbox */
+  justify-content: center; /* Căn giữa chữ theo chiều ngang */
+  align-items: center;    /* Căn giữa chữ theo chiều dọc */
+  width: 100%;  /* Đảm bảo label chiếm toàn bộ chiều rộng của nút */
+  height: 100%;  /* Đảm bảo label chiếm toàn bộ chiều cao của nút */
+  cursor: pointer;
 }
 .notif {
     font-size: 16px;
@@ -404,5 +414,19 @@ a {
       display: none; /* Ẩn tất cả hình ảnh và phần tử có class liên quan */
     }
     
+  }
+  .upload-notification {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    
+    padding: 10px 20px;
+    color: #000;
+    font-size: 16px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   

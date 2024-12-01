@@ -64,53 +64,9 @@ app.post("/api/user/login", async (req, res) => {
 
 // File upload endpoint
 // File upload endpoint
-app.post("/api/upload", upload.single("file"), async (req, res) => {
-  const { email } = req.body;
-  const file = req.file;
+// File upload endpoint with token authentication
 
-  if (!file || !email) {
-    return res.status(400).json({ message: "Email and file are required." });
-  }
 
-  try {
-    // Upload file to Cloudinary using cloudinary.uploader.upload
-    cloudinary.uploader.upload_stream(
-      { 
-        resource_type: "auto",  // Tự động nhận diện loại file (ví dụ: hình ảnh, video, PDF, ...)
-        access_mode: "public"   // Đảm bảo tệp là công khai
-      },
-      async (error, result) => {
-        if (error) {
-          return res.status(500).json({ message: "Error uploading file to Cloudinary", error });
-        }
-
-        const filePath = result.secure_url; // Cloudinary trả về URL của file đã upload
-
-        // Save file info to database
-        try {
-          const pool = await sql.connect(sqlConfig);
-          await pool.request()
-            .input("email", sql.VarChar, email)
-            .input("fileName", sql.VarChar, file.originalname)
-            .input("filePath", sql.VarChar, filePath)
-            .input("fileType", sql.VarChar, path.extname(file.originalname).substring(1))
-            .query(`
-              INSERT INTO files (email, file_name, file_path, file_type)
-              VALUES (@email, @fileName, @filePath, @fileType)
-            `);
-
-          res.status(200).json({ message: "File uploaded successfully to Cloudinary.", filePath });
-        } catch (err) {
-          console.error("Error saving file info to database:", err);
-          res.status(500).json({ message: "Error saving file info to database." });
-        }
-      }
-    ).end(file.buffer); // Truyền file.buffer vào .upload_stream để tải lên Cloudinary
-  } catch (err) {
-    console.error("Error:", err);
-    res.status(500).json({ message: "Error uploading file." });
-  }
-});
 
 app.get("/api/files", async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1]; // Lấy token từ header Authorization
@@ -161,7 +117,54 @@ const verifyToken = (req, res, next) => {
     return res.status(401).json({ message: "Unauthorized: Invalid or expired token" });
   }
 };
+app.post("/api/upload", verifyToken, upload.single("file"), async (req, res) => {
+  const { email } = req.user;  // Extract email from the token (verified)
+  const file = req.file;
 
+  if (!file) {
+    return res.status(400).json({ message: "File is required." });
+  }
+
+  try {
+    // Upload file to Cloudinary using cloudinary.uploader.upload
+    cloudinary.uploader.upload_stream(
+      {
+        resource_type: "auto",  // Automatically detect file type (image, video, PDF, etc.)
+        access_mode: "public",  // Make the file publicly accessible
+      },
+      async (error, result) => {
+        if (error) {
+          return res.status(500).json({ message: "Error uploading file to Cloudinary", error });
+        }
+
+        const filePath = result.secure_url; // Cloudinary returns the secure URL of the uploaded file
+
+        // Save file info to database
+        try {
+          const pool = await sql.connect(sqlConfig);
+          await pool.request()
+            .input("email", sql.VarChar, email)
+            .input("fileName", sql.VarChar, file.originalname)
+            .input("filePath", sql.VarChar, filePath)
+            .input("fileType", sql.VarChar, path.extname(file.originalname).substring(1))
+            .query(`
+              INSERT INTO files (email, file_name, file_path, file_type)
+              VALUES (@email, @fileName, @filePath, @fileType)
+            `);
+
+          // Send success response with file URL
+          res.status(200).json({ message: "File uploaded successfully to Cloudinary.", filePath });
+        } catch (err) {
+          console.error("Error saving file info to database:", err);
+          res.status(500).json({ message: "Error saving file info to database." });
+        }
+      }
+    ).end(file.buffer); // Pass file buffer to .upload_stream to upload it to Cloudinary
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).json({ message: "Error uploading file." });
+  }
+});
 // Endpoint xử lý in
 app.post("/print", verifyToken, async (req, res) => {
   const { fileDetails, printSettings, printer } = req.body;
@@ -239,6 +242,22 @@ app.get("/history", verifyToken, async (req, res) => {
   } catch (err) {
     console.error("Lỗi khi lấy lịch sử in:", err);
     res.status(500).json({ message: "Lỗi khi lấy lịch sử in." });
+  }
+});
+app.get("/printers", async (req, res) => {
+  try {
+    // Kết nối đến SQL Server
+    const pool = await sql.connect(sqlConfig);
+
+    // Query dữ liệu
+    let result = await pool.request().query("SELECT * FROM Printer");
+    
+    // Trả về danh sách máy in
+    res.json(result.recordset);
+
+  } catch (err) {
+    console.error("Error fetching printers:", err);
+    res.status(500).send("Internal Server Error");
   }
 });
 // Start server
