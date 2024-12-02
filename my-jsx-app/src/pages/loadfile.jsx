@@ -156,7 +156,7 @@ export const TaiFile = () => {
               {files.map((file, index) => (
                 <tr key={index}>
                   <td>{file.name}</td>
-                  <td>{file.size}</td>
+                  <td>{file.type}</td>
                   <td>{file.date}</td>
                   <td>
                     <button

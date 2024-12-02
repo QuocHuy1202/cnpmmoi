@@ -106,7 +106,8 @@ export const Print = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token); // Set login status based on token existence
+    setIsLoggedIn(!!token);
+    if(!token ) {navigate("/login");} // Set login status based on token existence
   }, []);
   useEffect(() => {
     // Lấy thông tin từ localStorage

@@ -5,16 +5,33 @@ import chuong from "../image/chuong.png";
 import mess from "../image/mess.png";
 import avar from "../image/avar.svg";
 import "../css/printhistory.css";
-
+import { useNavigate } from "react-router-dom";
 export const PaymentHistory = () => {
+  const navigate = useNavigate();
   const [paymentData, setPaymentData] = useState([]);
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
-
+  const [isAvatarPopupOpen, setIsAvatarPopupOpen] = useState(false); // Popup for avatar
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const toggleAvatarPopup = () => {
+    setIsAvatarPopupOpen(!isAvatarPopupOpen); // Toggle avatar popup
+  };
+  const handleLogout = () => {
+    localStorage.clear(); // Xóa tất cả các mục trong localStorage
+    // Remove token from localStorage
+    setIsLoggedIn(false); // Update the logged-in status
+    navigate("/login"); // Redirect user to the login page
+  };
+  // Check if user is logged in
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+    if(!token ) {navigate("/login");} // Set login status based on token existence
+  }, []);
   useEffect(() => {
     const fetchPaymentHistory = async () => {
       try {
         const token = localStorage.getItem("token");
-
+        
         const response = await fetch("http://localhost:5001/payment-history", {
           method: "GET",
           headers: {
@@ -28,7 +45,7 @@ export const PaymentHistory = () => {
           setPaymentData(result.payments); // Lưu dữ liệu thanh toán vào state
         } else {
           const error = await response.json();
-          alert(`Lỗi khi lấy lịch sử thanh toán: ${error.message}`);
+          
         }
       } catch (err) {
         console.error("Lỗi khi lấy lịch sử thanh toán:", err);
@@ -57,18 +74,34 @@ export const PaymentHistory = () => {
               <Link to="/" className="trangchuls">
                 Trang chủ
               </Link>
-              <Link to="/payment-history" className="xemls">
+              <Link to="/paymentlist" className="xemls">
                 Xem lịch sử thanh toán
               </Link>
             </nav>
           )}
         </nav>
-        <img src={chuong} alt="Tbao" className="Tbao" />
-        <img src={mess} alt="tnhan" className="tnhan" />
-        <button className="setting"></button>
-        <img src={avar} alt="hAnh" className="hAnh" />
+        {isLoggedIn ? (
+          <div className="avatar-link" onClick={toggleAvatarPopup}>
+            <img src={avar} alt="hAnh" className="hAnh" /> {/* Avatar */}
+          </div>
+        ) : (
+          <Link to="/login" className="dangnhap">
+            Đăng nhập
+          </Link>
+        )}
       </header>
-
+      {isAvatarPopupOpen && isLoggedIn && (
+        <div className="avatar-popup">
+          <ul>
+            <li>
+              <Link to="/profile" onClick={toggleAvatarPopup}>
+                Profile
+              </Link>
+            </li>
+            <li onClick={handleLogout}>Log out</li>
+          </ul>
+        </div>
+      )}
       <div className="history-content">
         <h1>Lịch sử thanh toán</h1>
         {paymentData.length === 0 ? (

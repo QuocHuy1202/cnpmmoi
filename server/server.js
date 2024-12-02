@@ -21,9 +21,9 @@ cloudinary.config({
 
 const sqlConfig = {
   user: "sa",
-  password: "123456aA@$",
+  password: "huy1202",
   server: "localhost",
-  database: "AccountDB3",
+  database: "AccountDB",
   options: {
     encrypt: true,
     trustServerCertificate: true,

@@ -24,7 +24,8 @@ export const PrintHistory = () => {
   // Check if user is logged in
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token); // Set login status based on token existence
+    setIsLoggedIn(!!token);
+    if(!token ) {navigate("/login");} // Set login status based on token existence
   }, []);
   useEffect(() => {
     const fetchPrintHistory = async () => {
@@ -44,7 +45,7 @@ export const PrintHistory = () => {
           setHistoryData(result.history); // Lưu dữ liệu vào state
         } else {
           const error = await response.json();
-          alert(`Lỗi khi lấy lịch sử in: ${error.message}`);
+          
         }
       } catch (err) {
         console.error("Lỗi khi lấy lịch sử in:", err);

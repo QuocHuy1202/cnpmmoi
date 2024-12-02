@@ -27,7 +27,8 @@ export const Profile = () => {
   // Check if user is logged in
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token); // Set login status based on token existence
+    setIsLoggedIn(!!token); 
+    if(!token ) {navigate("/login");}// Set login status based on token existence
   }, []);
   useEffect(() => {
     const handleResize = () => setIsMobileView(window.innerWidth <= 768);
