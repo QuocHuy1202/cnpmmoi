@@ -22,7 +22,7 @@ export const Login = () => {
       setError(""); // Clear error message if both fields are filled
 
       try {
-        const response = await fetch(`${backendUrl}/api/user/login`, {
+        const response = await fetch(`${backendUrl}/api/account/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -41,8 +41,18 @@ export const Login = () => {
             "number_of_pages_remaining",
             data.number_of_pages_remaining
           );
+          localStorage.setItem("account_type", data.account_type); // Save account_type
+          
           toast.success("Đăng nhập thành công!"); // Show success message
-          navigate("/"); // Redirect to the home page after login
+          const accountType = data.account_type;
+
+          // Kiểm tra giá trị account_type và điều hướng
+          if (accountType === "Student") {
+            navigate("/"); // Redirect to the home page after login
+          } else {
+            navigate("/spso"); // Redirect to another page
+          }
+                    
         } else {
           // Login failed, handle error
           const errorData = await response.json();

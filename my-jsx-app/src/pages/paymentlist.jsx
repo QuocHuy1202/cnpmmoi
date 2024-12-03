@@ -32,7 +32,7 @@ export const PaymentHistory = () => {
       try {
         const token = localStorage.getItem("token");
         
-        const response = await fetch("http://localhost:5001/payment-history", {
+        const response = await fetch("http://localhost:5001/api/payment/payment-history", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

@@ -32,7 +32,7 @@ export const PrintHistory = () => {
       try {
         const token = localStorage.getItem("token");
 
-        const response = await fetch("http://localhost:5001/history", {
+        const response = await fetch("http://localhost:5001/api/printers/history", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

@@ -61,7 +61,7 @@ export const Print = () => {
     setIsUploading(true);
 
     try {
-      const response = await fetch("http://localhost:5001/api/upload", {
+      const response = await fetch("http://localhost:5001/api/files/upload", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`, // Gửi token trong header Authorization
@@ -138,7 +138,7 @@ export const Print = () => {
     // Gọi API để lấy danh sách máy in
     const fetchPrinters = async () => {
       try {
-        const response = await fetch("http://localhost:5001/printers");
+        const response = await fetch("http://localhost:5001/api/printers");
         const data = await response.json();
         setPrinters(data); // Cập nhật danh sách máy in
       } catch (error) {
@@ -192,7 +192,7 @@ export const Print = () => {
     try {
       // Gửi dữ liệu tới server
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5001/print", {
+      const response = await fetch("http://localhost:5001/api/printers/print", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
