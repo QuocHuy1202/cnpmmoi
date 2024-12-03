@@ -1,0 +1,84 @@
+
+.trangchuls{
+    padding: 10px 15px;
+    border: none;
+    background-color:  #007bff ;
+    color: white;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.trangchuls:hover {
+    background-color: #0e2ee5fc ;/* Màu nền khi hover */
+}
+.quanlils {
+    padding: 10px 15px;
+    border: none;
+    background-color:  #007bff;
+    color: white;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.quanlils:hover {
+    background-color: #0e2ee5fc; /* Màu nền khi hover */
+}
+
+.dieuchinhls {
+    padding: 10px 15px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.dieuchinhls:hover {
+    background-color: #0e2ee5fc; /* Màu nền khi hover */
+}
+.xemls {
+    padding: 10px 15px;
+    border: none;
+    background-color: #0026fffc ;
+    color: white;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.history-content {
+    width: 80%;
+    margin: 0 auto;
+}
+
+.filters {
+    width: 80%;
+    margin: 0 auto;
+}
+
+.details-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.details-table th,
+.details-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    height: 50px;
+}
+
+.details-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.details-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.details-table tr:hover {
+    background-color: #ddd;
+}

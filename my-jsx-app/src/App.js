@@ -11,6 +11,9 @@ import {PrintHistory} from "./pages/printhistory.jsx"
 import {PaymentHistory} from "./pages/paymentlist.jsx"
 import { Payment } from "./pages/payment.jsx"
 import { Profile } from "./pages/profile.jsx"
+import { AdjustPrint} from "./pages/adjust.jsx"
+import { ManagerPrint} from "./pages/managerPrint.jsx"
+import { HistorySPSO} from "./pages/historyspso.jsx"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 function App() {
@@ -29,6 +32,9 @@ function App() {
             <Route path="/printsetting" element={<PrintPage />} />
             <Route path="/history" element={<PrintHistory />} /> 
             <Route path="/spso" element={<SPSO />} /> 
+            <Route path="/adjust" element={<AdjustPrint />} /> 
+            <Route path="/managerprint" element={<ManagerPrint />} /> 
+            <Route path="/historyspso" element={<HistorySPSO />} /> 
           </Routes>
       </Router>
     

@@ -1,0 +1,332 @@
+/* Đặt nền tổng thể */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+  }
+  
+.app {
+    text-align: center;
+  }
+  
+  /* Header */
+.header {
+    background-color: #007bff; /* Màu xanh header */
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+  }
+  
+.logo {
+    height: 50px;
+    
+    margin-right: 30px;
+   
+  }
+  
+.navbar {
+    display: flex;
+    gap: 10px;
+}
+
+.trangchuspso{
+    padding: 10px 15px;
+    border: none;
+    background-color:  #0026fffc ;
+    color: white;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.quanlispso {
+    padding: 10px 15px;
+    border: none;
+    background-color:  #007bff  ;
+    color: white;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.quanlispso:hover {
+  background-color: #0e2ee5fc ; /* Màu nền khi hover */
+}
+.dieuchinhspso {
+    padding: 10px 15px;
+    border: none;
+    background-color:  #007bff;
+    color: white;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+.dieuchinhspso:hover {
+    background-color: #0e2ee5fc; /* Màu nền khi hover */
+  }
+.xemspso {
+    padding: 10px 15px;
+    border: none;
+    background-color:  #007bff;
+    color: white;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+.xemspso:hover {
+    background-color: #0e2ee5fc; /* Màu nền khi hover */
+  }
+.dangnhap {
+    padding: 10px 15px;
+    border: none;
+    background-color:  #007bff;
+    color: white;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: auto;
+  }
+.dangnhap:hover {
+    background-color: #0e2ee5fc; /* Màu nền khi hover */
+}
+.Tbao {
+    height: 20px;
+    padding: 16px 15px;
+    margin: 0px 15px;
+    position: absolute;
+    top: 10px; /* Khoảng cách từ lề trên */
+    right: 120px;
+    object-fit: contain;
+    z-index: 10; /* Đảm bảo ảnh nổi lên trên các phần tử khác */
+    cursor: pointer;
+}
+.tnhan {
+    height: 21px;
+    padding: 15px 15px;
+    margin: 0px 15px;
+    position: absolute;
+    top: 10px; /* Khoảng cách từ lề trên */
+    right: 85px;
+    object-fit: contain;
+    z-index: 10; /* Đảm bảo ảnh nổi lên trên các phần tử khác */
+    cursor: pointer;
+}
+.hAnh {
+    height: 30px;
+    padding: 12px 15px;
+    margin: 0px 15px;
+    position: absolute;
+    top: 10px; /* Khoảng cách từ lề trên */
+    right: 40px;
+    object-fit: contain;
+    z-index: 10; /* Đảm bảo ảnh nổi lên trên các phần tử khác */
+    cursor: pointer;
+} 
+  
+ 
+  .overlap-2 {
+    background-image: url(../image/image-1.png);
+    background-position: 50% 50%;
+    background-size: cover;
+    height: 90%;
+    left: 0;
+    position: absolute;
+    top: 70px;
+    width: 100%;
+    z-index:2;
+  }
+ @media (max-width: 768px){
+    .logo {
+        height: 50px;
+        margin-left: 30px;
+        margin-right: 30px;
+       
+      }
+ }
+ 
+.welcome-section {
+  position: absolute;
+  left: 5%; /* Đặt sát lề trái */
+  top: 20px; /* Canh giữa theo chiều dọc */
+  /* Dịch chuyển để canh giữa chính xác */
+  background-color: rgba(182, 182, 182, 0.7); /* Nền xám mờ */
+  padding: 20px;
+  border-radius: 8px;
+  width: 40%; /* Chiều rộng chiếm 30% màn hình */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Đổ bóng nhẹ */
+}
+
+.welcome-section h1 {
+  font-size: 40px;
+  margin: 0;
+  color: #333; /* Màu chữ đậm */
+}
+
+.welcome-section p {
+  font-size: 32px;
+  margin-top: 10px;
+  color: #555; /* Màu chữ nhạt hơn */
+}
+
+/* Responsive cho màn hình nhỏ */
+@media (max-width: 768px) {
+  .welcome-section {
+    width: 40%; /* Giảm chiều rộng cho màn hình nhỏ */
+    left: 10%; /* Đưa vào giữa màn hình */
+     /* Dịch chuyển để căn giữa */
+  }
+
+  .welcome-section h1 {
+    font-size: 28px; /* Giảm kích thước font chữ */
+  }
+
+  .welcome-section p {
+    font-size: 24px; /* Giảm kích thước font chữ */
+  }
+}
+a {
+  text-decoration: none;
+}
+
+.popup a {
+  text-decoration: none; /* Loại bỏ dấu gạch chân trong popup */
+}
+
+.navbar a {
+  text-decoration: none; /* Loại bỏ dấu gạch chân cho các liên kết trong navbar */
+}
+
+.trangchu-bot, .in-bot.active, .xem-bot, .dang-nhap {
+  text-decoration: none; /* Loại bỏ dấu gạch chân cho các button */
+}
+
+.trangchu-bot:hover, .in-bot.active:hover, .xem-bot:hover, .dang-nhap:hover {
+  text-decoration: none; /* Loại bỏ dấu gạch chân khi hover */
+}
+.menu-button {
+  display: none; /* Ẩn theo mặc định */
+  background-color: transparent;
+  border: none;
+  font-size: 2rem; /* Kích thước chữ cho dấu menu */
+  color: #121010; /* Màu chữ */
+  cursor: pointer;
+  z-index: 1001; /* Đảm bảo nút xuất hiện trên các phần tử khác */
+  position: absolute;
+  top: 15px; /* Căn vị trí nút menu ở góc trên bên trái */
+  left: 0px; /* Căn vị trí nút menu */
+}
+
+/* Khi màn hình nhỏ (dưới 768px) */
+@media screen and (max-width: 768px) {
+  .menu-button {
+    display: block; /* Hiển thị nút menu khi màn hình nhỏ */
+  }
+}
+/* Popup menu */
+.popup {
+  position: absolute;
+  top: 70px;
+  left: 0;
+  width: 45%;
+  height: 100vh;
+  background-color: #ffffff; /* Màu nền mờ */
+  display: flex;
+  flex-direction: column;
+  
+  z-index: 100; /* Đảm bảo menu popup nằm trên các phần tử khác */
+}
+
+/* Các phần tử trong menu popup */
+.popup ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.popup ul li {
+  padding: 10px 20px;
+  font-size: 18px;
+  text-align: left;
+  color: #121010;
+  border-bottom: 1px solid #d9d9d9; /* Thêm vạch ngăn cách */
+}
+.popup ul li a {
+  text-decoration: none;
+  color: #0a0a0a;
+  font-size: 20px;
+  font-weight: 100;
+  font-family: "Inter-Regular", Helvetica;
+  z-index: 1000;
+  left:10px;
+}
+
+
+
+/* Tùy chỉnh hover */
+.popup ul li:hover {
+  background-color: #f1f1f1;
+}
+/* Avatar icon */
+.avatar-link {
+  position: absolute; /* Sử dụng absolute để căn vào góc */
+  top: 0px;  /* Căn giữa theo chiều dọc của header */
+  right: 0px;  /* Căn vào góc phải của header */
+   /* Điều chỉnh để căn giữa hoàn hảo theo chiều dọc */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.hAnh {
+  height: 40px;
+  padding: 5px 0px;
+  margin: 0px 15px;
+  position: absolute;
+  top: 10px;
+  right: 40px;
+  object-fit: contain;
+  z-index: 10;
+  cursor: pointer;
+}
+
+/* Popup Avatar */
+.avatar-popup {
+  position: absolute;
+  top: 70px;  /* Position the popup below the avatar */
+  right: 0;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 10px;
+  z-index: 1000;  /* Ensure it's on top of other content */
+  width: 150px;
+}
+
+.avatar-popup ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.avatar-popup li {
+  padding: 8px 0;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.avatar-popup li:last-child {
+  border-bottom: none;
+}
+
+.avatar-popup li:hover {
+  background-color: #f4f4f4;
+}
+
+.avatar-popup a {
+  text-decoration: none;
+  color: #333;
+}
+
+.avatar-popup li:hover a {
+  color: #007bff;
+}
