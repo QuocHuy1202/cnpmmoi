@@ -130,6 +130,31 @@ export const AdjustPrint = () => {
       <div className="adjust-content">
         <h1>Điều chỉnh</h1>
         <div className="adjust-section">
+          <div className="adjust-section2">
+            <h2>Chọn khoảng thời gian</h2>
+            <div className="time-range">
+              <label class>
+                Từ ngày:
+                <input
+                  type="datetime-local"
+                  value={Time.start}
+                  onChange={(e) =>
+                    setTime((prev) => ({ ...prev, start: e.target.value }))
+                  }
+                />
+              </label>
+              <label>
+                Đến ngày:
+                <input
+                  type="datetime-local"
+                  value={Time.end}
+                  onChange={(e) =>
+                    setTime((prev) => ({ ...prev, end: e.target.value }))
+                  }
+                />
+              </label>
+            </div>
+          </div>
           <div className="page-defailt">
             <h2>Chỉnh sửa số trang in mặc định</h2>
             <input
@@ -137,20 +162,6 @@ export const AdjustPrint = () => {
               value={defaultPages}
               onChange={(e) => setDefaultPages(e.target.value)}
             />
-          </div>
-          <div className="adjust-section1">
-            <h2>Kiểm soát các định dạng file cho phép in</h2>
-            {sampleFormats.map((format) => (
-              <div key={format} className="format-adjust">
-                <input
-                  type="checkbox"
-                  value={format}
-                  checked={allowedFormats.includes(format)}
-                  onChange={handleAllowedFormatsChange}
-                />
-                <label>{format}</label>
-              </div>
-            ))}
           </div>
           <div className="adjust-section2">
             <h2>Đặt giới hạn về số lượng bản in cho 1 lần in</h2>
@@ -160,11 +171,59 @@ export const AdjustPrint = () => {
               onChange={handlePrintLimitChange}
             />
           </div>
-          <div className="adjust-section2">
-            <h2>Đặt thời gian cấp mặc định</h2>
-            <input type="number" value={Time} onChange={handleTimeChange} />
-            <h2>Ngày</h2>
+          <div className="adjust-section1">
+            <h2>Kiểm soát các định dạng file cho phép in</h2>
+            {/* Input để nhập định dạng file */}
+            <div className="add-format">
+              <input
+                type="text"
+                placeholder="Nhập định dạng file (VD: PDF, DOCX)"
+                value={studentIdInput}
+                onChange={(e) => setStudentIdInput(e.target.value)} // Cập nhật giá trị nhập
+              />
+              <button
+                onClick={() => {
+                  if (
+                    studentIdInput.trim() !== "" && // Không cho phép chuỗi rỗng
+                    !allowedFormats.includes(
+                      studentIdInput.trim().toUpperCase()
+                    ) // Không thêm trùng lặp
+                  ) {
+                    setAllowedFormats([
+                      ...allowedFormats,
+                      studentIdInput.trim().toUpperCase(),
+                    ]);
+                    setStudentIdInput(""); // Xóa giá trị nhập
+                  }
+                }}
+              >
+                Thêm
+              </button>
+            </div>
+
+            {/* Khung hiển thị danh sách định dạng file */}
+            <div className="allowed-formats-list">
+              {allowedFormats.length > 0 ? (
+                allowedFormats.map((format, index) => (
+                  <div key={index} className="format-item">
+                    <span>{format}</span>
+                    <button
+                      onClick={() =>
+                        setAllowedFormats(
+                          allowedFormats.filter((item) => item !== format)
+                        )
+                      }
+                    >
+                      Xóa
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p>Không có định dạng file nào được cho phép.</p>
+              )}
+            </div>
           </div>
+
           <button
             onClick={() =>
               setStudents(

@@ -8,54 +8,57 @@ import "../css/historyspso.css";
 export const HistorySPSO = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
-  const [historyData, setHistoryData] = useState([]);
+  const [mssv, setMssv] = useState("");
   const [printers, setPrinters] = useState([]);
   const [students, setStudents] = useState([]);
-  const [selectedPrinter, setSelectedPrinter] = useState("");
   const [selectedStudent, setSelectedStudent] = useState("");
-  const [printDetails, setPrintDetails] = useState([]);
-  const [studentPrintDetails, setStudentPrintDetails] = useState([]);
+  const [selectedPrinter, setSelectedPrinter] = useState("");
+  const [studentDetails, setStudentDetails] = useState([]);
+  const [printerDetails, setPrinterDetails] = useState([]);
   const [isAvatarPopupOpen, setIsAvatarPopupOpen] = useState(false); // Popup for avatar
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate(); // Hook to navigate user
 
-  // Sample data for testing
-
+  // bảng ví dụ select lại cho phù hợp
   const samplePrinters = [
+    { id: "tất cả", name: "tất cả máy in" },
     { id: "printer1", name: "Printer 1" },
     { id: "printer2", name: "Printer 2" },
   ];
 
   const sampleStudents = [
-    { id: "2234567", name: "Student 1" },
-    { id: "2234568", name: "Student 2" },
+    { id: "2213732", name: "Student 1" },
+    { id: "2212345", name: "Student 2" },
   ];
 
-  const sampleHistoryData = [
+  const samplePrinterDetails = [
     {
-      id: 1,
-      date: "2023-10-01",
-      username: "Student 1",
-      pageCount: 10,
-      status: "Completed",
+      fileName: "file1.pdf",
+      printQuantity: 10,
+      fileFormat: "PDF",
+      printDate: "2023-10-01",
     },
     {
-      id: 2,
-      date: "2023-10-02",
-      username: "Student 2",
-      pageCount: 5,
-      status: "Completed",
+      fileName: "file2.docx",
+      printQuantity: 5,
+      fileFormat: "DOCX",
+      printDate: "2023-10-02",
     },
   ];
 
-  const samplePrintDetails = [
-    { fileName: "file1.pdf", printQuantity: 10, fileFormat: "PDF" },
-    { fileName: "file2.docx", printQuantity: 5, fileFormat: "DOCX" },
-  ];
-
-  const sampleStudentPrintDetails = [
-    { id: "2234567", name: "Student 1", printQuantity: 10 },
-    { id: "2234568", name: "Student 2", printQuantity: 5 },
+  const sampleStudentDetails = [
+    {
+      fileName: "file1.pdf",
+      printQuantity: 10,
+      fileFormat: "PDF",
+      printDate: "2023-10-01",
+    },
+    {
+      fileName: "file2.docx",
+      printQuantity: 5,
+      fileFormat: "DOCX",
+      printDate: "2023-10-02",
+    },
   ];
   const toggleAvatarPopup = () => {
     setIsAvatarPopupOpen(!isAvatarPopupOpen); // Toggle avatar popup
@@ -70,31 +73,10 @@ export const HistorySPSO = () => {
     setIsLoggedIn(!!token); // Set login status based on token existence
   }, []);
   useEffect(() => {
-    // Use sample data instead of fetching from API
+    // Sample data loading
     setPrinters(samplePrinters);
+    setStudents(sampleStudents);
   }, []);
-
-  useEffect(() => {
-    if (selectedPrinter) {
-      // Use sample data instead of fetching from API
-      setStudents(sampleStudents);
-      setStudentPrintDetails(sampleStudentPrintDetails);
-    }
-  }, [selectedPrinter]);
-
-  useEffect(() => {
-    if (selectedPrinter && selectedStudent) {
-      // Use sample data instead of fetching from API
-      setHistoryData(sampleHistoryData);
-    }
-  }, [selectedPrinter, selectedStudent]);
-
-  useEffect(() => {
-    if (selectedStudent) {
-      // Use sample data instead of fetching from API
-      setPrintDetails(samplePrintDetails);
-    }
-  }, [selectedStudent]);
 
   useEffect(() => {
     const handleResize = () => setIsMobileView(window.innerWidth <= 768);
@@ -106,12 +88,25 @@ export const HistorySPSO = () => {
     setIsPopupOpen(!isPopupOpen);
   };
 
-  const handleStudentChange = (e) => {
-    const value = e.target.value;
-    if (value === "allstudent") {
-      setSelectedStudent("");
+  const handlePrinterChange = (e) => {
+    const printerId = e.target.value;
+    setSelectedPrinter(printerId);
+
+    if (printerId) {
+      setPrinterDetails(samplePrinterDetails);
     } else {
-      setSelectedStudent(value);
+      setPrinterDetails([]);
+    }
+  };
+
+  const handleSearchStudent = () => {
+    const student = students.find((student) => student.id === mssv);
+    if (student) {
+      setSelectedStudent(student.id);
+      setStudentDetails(sampleStudentDetails);
+    } else {
+      alert("Sinh viên không tìm thấy!");
+      setStudentDetails([]);
     }
   };
 
@@ -159,78 +154,93 @@ export const HistorySPSO = () => {
         </div>
       )}
       <div className="history-content">
-        <h1>Lịch sử in ấn</h1>
-        <div className="filters">
-          <select
-            value={selectedPrinter}
-            onChange={(e) => setSelectedPrinter(e.target.value)}
-          >
-            <option value="">Chọn máy in</option>
-            {printers.map((printer) => (
-              <option key={printer.id} value={printer.id}>
-                {printer.name}
-              </option>
-            ))}
-          </select>
-          {selectedPrinter && (
-            <select value={selectedStudent} onChange={handleStudentChange}>
-              <option value="allstudent">Tất cả sinh viên</option>
-              {students.map((student) => (
-                <option key={student.id} value={student.id}>
-                  {student.name}
+        <h1>Quản lý máy in và sinh viên</h1>
+        <div className="option">
+          {/* Chọn máy in */}
+          <div className="printer-selection">
+            <h2>Chọn máy in</h2>
+            <select value={selectedPrinter} onChange={handlePrinterChange}>
+              <option value="">Chọn máy in</option>
+              {printers.map((printer) => (
+                <option key={printer.id} value={printer.id}>
+                  {printer.name}
                 </option>
               ))}
             </select>
-          )}
-        </div>
-        {selectedPrinter &&
-          !selectedStudent &&
-          studentPrintDetails.length > 0 && (
-            <div className="student-print-details">
-              <h2>Chi tiết in của Máy in</h2>
+          </div>
+
+          {/* Hiển thị thông tin máy in */}
+          {selectedPrinter && printerDetails.length > 0 && (
+            <div className="printer-details">
+              <h2>Thông tin Máy in</h2>
               <table className="details-table">
                 <thead>
                   <tr>
-                    <th>MSSV</th>
-                    <th>Tên</th>
-                    <th>Số lượng bản in</th>
+                    <th>Tên file</th>
+                    <th>Số lượng in</th>
+                    <th>Định dạng file</th>
+                    <th>Ngày tháng in</th> {/* Thêm cột ngày tháng in */}
                   </tr>
                 </thead>
                 <tbody>
-                  {studentPrintDetails.map((detail) => (
-                    <tr key={detail.id}>
-                      <td>{detail.id}</td>
-                      <td>{detail.name}</td>
+                  {printerDetails.map((detail, index) => (
+                    <tr key={index}>
+                      <td>{detail.fileName}</td>
                       <td>{detail.printQuantity}</td>
+                      <td>{detail.fileFormat}</td>
+                      <td>{detail.printDate}</td> {/* Hiển thị ngày tháng in */}
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           )}
-        {selectedStudent && printDetails.length > 0 && (
-          <div className="print-details">
-            <h2>Chi tiết in của Sinh viên</h2>
-            <table className="details-table">
-              <thead>
-                <tr>
-                  <th>Tên file</th>
-                  <th>Số lượng in</th>
-                  <th>Định dạng file</th>
-                </tr>
-              </thead>
-              <tbody>
-                {printDetails.map((detail) => (
-                  <tr key={detail.fileName}>
-                    <td>{detail.fileName}</td>
-                    <td>{detail.printQuantity}</td>
-                    <td>{detail.fileFormat}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+          {/* Tìm kiếm sinh viên */}
+          <div className="student-search">
+            <h2>Tìm kiếm sinh viên theo MSSV</h2>
+            <input
+              type="text"
+              placeholder="Nhập MSSV"
+              value={mssv}
+              onChange={(e) => setMssv(e.target.value)}
+            />
+            <button onClick={handleSearchStudent}>Tìm kiếm</button>
           </div>
-        )}
+
+          {/*!  Hiển thị thông tin sinh viên */}
+          {studentDetails.length > 0 && (
+            <div className="student-details">
+              <h2>Thông tin Sinh viên</h2>
+              <table className="details-table">
+                <thead>
+                  <tr>
+                    <th>MSSV</th> {/* Cột MSSV */}
+                    <th>Tên Sinh viên</th> {/* Cột Tên sinh viên */}
+                    <th>Tên file</th>
+                    <th>Số lượng in</th>
+                    <th>Định dạng file</th>
+                    <th>Ngày tháng in</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {studentDetails.map((detail, index) => (
+                    <tr key={index}>
+                      <td>{mssv}</td>
+                      <td>
+                        {students.find((student) => student.id === mssv)?.name}
+                      </td>{" "}
+                      <td>{detail.fileName}</td>
+                      <td>{detail.printQuantity}</td>
+                      <td>{detail.fileFormat}</td>
+                      <td>{detail.printDate}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
 
       {isPopupOpen && isMobileView && (

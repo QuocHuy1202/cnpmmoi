@@ -9,7 +9,7 @@
     cursor: pointer;
 }
 .trangchuls:hover {
-    background-color: #0e2ee5fc ;/* Màu nền khi hover */
+    background-color: #0e2ee5fc ;
 }
 .quanlils {
     padding: 10px 15px;
@@ -21,7 +21,7 @@
     cursor: pointer;
 }
 .quanlils:hover {
-    background-color: #0e2ee5fc; /* Màu nền khi hover */
+    background-color: #0e2ee5fc; 
 }
 
 .dieuchinhls {
@@ -34,7 +34,7 @@
     cursor: pointer;
 }
 .dieuchinhls:hover {
-    background-color: #0e2ee5fc; /* Màu nền khi hover */
+    background-color: #0e2ee5fc; 
 }
 .xemls {
     padding: 10px 15px;
@@ -47,38 +47,106 @@
 }
 
 .history-content {
-    width: 80%;
-    margin: 0 auto;
+    padding: 20px;
 }
-
-.filters {
-    width: 80%;
-    margin: 0 auto;
-}
-
+.option{
+    display: flex;
+    flex-direction: column;
+}  
+.printer-selection select {
+    width: 100%; 
+    height: 40px; 
+    padding: 0 10px; 
+    font-size: 16px; 
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    box-sizing: border-box; 
+    text-align: center; 
+    line-height: 40px;
+  }
+  
+.student-search {
+    margin-top: 30px;
+    display: flex;
+    align-items: center; 
+    gap: 10px; 
+  }
+  
+.student-search input {
+    flex: 1; 
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-width: 200px; 
+  }
+  
+.student-search button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50; 
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+.student-search button:hover {
+    background-color: #45a049; 
+  }
+  
+  
 .details-table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed;
 }
-
-.details-table th,
-.details-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-    height: 50px;
-}
-
-.details-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-}
-
-.details-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-.details-table tr:hover {
-    background-color: #ddd;
-}
+  
+  .details-table th, .details-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .details-table th {
+    background-color: #f4f4f4;
+  }
+  
+  button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  .details-table th, .details-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .details-table th {
+    background-color: #f4f4f4;
+  }
+  
+  .details-table td {
+    word-wrap: break-word;
+  }
+  
+  button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }  
