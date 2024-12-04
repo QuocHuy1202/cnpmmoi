@@ -9,7 +9,7 @@ const login = async (req, res) => {
     if (!user || user.password !== password) {
       return res.status(400).json({ message: "Email or password is incorrect" });
     }
-
+    console.log(user.number_of_pages_remaining)
     const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET || "jwt_secret_key", { expiresIn: "6h" });
     res.status(200).json({
       token,

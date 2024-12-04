@@ -237,7 +237,7 @@
 .page-defailt {
     display: flex;
     padding : 20px;
-    gap : 20px
+    gap : 20px;
 }
 .adjust-section3 {
     display: flex;
@@ -269,3 +269,4 @@
 .adjust-section3 button:hover {
     background-color: #005bb5;
 }
+
