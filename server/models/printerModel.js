@@ -44,10 +44,64 @@ const getPrintHistoryByEmail = async (email) => {
   return result.recordset;
 };
 
+const addPrinterQuery = async (brand, model, location, status) => {
+  const pool = await connectDB();
+  //console.log("QUERY ADD PRINTER");
+  const result = await pool.request()
+    .input("brand", brand)
+    .input("model", model)
+    .input("location", location)
+    .input("status", status)
+    .query(`
+      INSERT INTO Printer (brand, model, status, location)
+      VALUES (@brand, @model, @status, @location)
+    `);
+  //console.log(result);
+}
+
+const deletePrinterQuery = async (delete_printers) => {
+  const pool = await connectDB();
+  //console.log("QUERY DELETE PRINTER");
+  //console.log(delete_printers);
+  try {
+    for (const printerId of delete_printers) {
+      // Delete query for each printer ID
+      const result = await pool.request()
+      .input("ID", printerId)
+      .query(`
+        DELETE FROM Printer
+        WHERE ID = @ID
+      `);
+      if (result.affectedRows === 0) {
+        //console.log(`Printer with ID ${printerId} not found.`);
+      }
+    }
+  } catch (error) {
+    //console.error('Error deleting printers:', error);
+  }
+}
+
+const updatePrinterStatusQuery = async (ID, status) => {
+  //console.log(ID, status);
+  const pool = await connectDB();
+  //console.log("QUERY UPDATE PRINTER STATUS");
+  const result = await pool.request()
+    .input("ID", ID)
+    .input("status", status)
+    .query(`
+      UPDATE Printer
+      SET status = @status
+      WHERE ID = @ID;
+    `);
+  //console.log(result);
+}
+
 module.exports = {
   getAllPrinters,
   createPrintRequest,
   getPrintHistoryByEmail,
+  addPrinterQuery,
+  deletePrinterQuery,
+  updatePrinterStatusQuery
 };
-
 

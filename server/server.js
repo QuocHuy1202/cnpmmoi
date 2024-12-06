@@ -14,7 +14,7 @@ const app = express();
 const port = process.env.PORT || 5001;
 
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors());  
 
 // Sử dụng các routes
 app.use("/api/account", accountRoutes);
@@ -26,5 +26,5 @@ app.use("/api/adjust", adjustRoutes);
 
 
 app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+  //console.log(`Server running on http://localhost:${port}`);
 });

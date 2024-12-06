@@ -3,6 +3,9 @@ import "../css/managerPrint.css";
 import { Link, useNavigate } from "react-router-dom";
 import avar from "../image/avar.svg";
 import image from "../image/image.png";
+import { toast } from "react-toastify";
+
+const backendUrl = "http://localhost:5001";
 
 export const ManagerPrint = () => {
   const navigate = useNavigate();
@@ -11,22 +14,55 @@ export const ManagerPrint = () => {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [name, setName] = useState("");
+  const [brand, setBrand] = useState(""); // New
+  const [model, setModel] = useState(""); // New
   const [location, setLocation] = useState("");
-  const [printers, setPrinters] = useState([
+  const [status, setStatus] = useState("Offline"); // Default status
+  const samplePrinters = [
     {
-      id: 1,
-      name: "Printer A",
+      ID: 1,
+      brand: "Brand1",
+      model: "Model1",
       location: "Office 1",
-      status: "Trạng thái: Đang Tắt",
+      status: "Offline",
     },
     {
-      id: 2,
-      name: "Printer B",
+      ID: 2,
+      brand: "Brand2",
+      model: "Model2",
       location: "Office 2",
-      status: "Trạng thái: Đang Bật",
+      status: "Online",
     },
-  ]);
+  ];
+  const [printers, setPrinters] = useState([]);
+  const getPrinters = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/api/printers/printers`);
+      if (!response.ok) {
+        // throw new Error('Lỗi khi lấy dữ liệu từ server');
+        const errorData = await response.json();
+        const errorMessage = errorData.message || "Fetch Printers failed!";
+        toast.error(errorMessage); // Show error message with toast
+      }
+      // Successful login
+      const data = await response.json();
+      //console.log(data);
+      return data;
+      
+    } catch (error) {
+      //console.error("Error:", error);
+      toast.error("Có lỗi xảy ra, vui lòng thử lại.");
+    }
+  }
+  useEffect(() => {
+    const fetchPrinters = async () => {
+      const fetchedPrinters = await getPrinters();
+      //console.log(fetchPrinters);
+      setPrinters(fetchedPrinters);
+    };
+    fetchPrinters();
+  }, []);
+
   const [selectedPrinters, setSelectedPrinters] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const handleLogout = () => {
@@ -55,57 +91,137 @@ export const ManagerPrint = () => {
     setIsAvatarPopupOpen(!isAvatarPopupOpen);
   };
 
-  const handleSubmit = (e) => {
+  const addPrinter = async () => {
+    try {
+      // Gửi yêu cầu POST lên backend
+      const response = await fetch(`${backendUrl}/api/printers/addPrinter`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          brand: brand,
+          model: model,
+          location: location,
+          status: status,
+        }),
+      });
+      if (!response.ok) {
+        // throw new Error('Lỗi khi lấy dữ liệu từ server');
+        const errorData = await response.json();
+        const errorMessage = errorData.message || "Fetch Printers failed!";
+        toast.error(errorMessage); // Show error message with toast
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      //console.error("Lỗi khi thêm máy in", error);
+    }
+  }
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newPrinter = {
-      id: Date.now(),
-      name,
-      location,
-      status: "Trạng thái: Đang Tắt",
-    };
-    setPrinters([...printers, newPrinter]);
-    setName("");
+    const response = await addPrinter();
+    setPrinters(response);
+    setBrand(""); // Reset
+    setModel(""); // Reset
     setLocation("");
+    setStatus("Offline"); // Default
     setShowSuccessMessage(true);
     setTimeout(() => {
       setShowSuccessMessage(false);
     }, 3000);
   };
 
-  const togglePrinterStatus = (id) => {
+  const togglePrinterStatus = async (ID) => {
+    // Find the printer with the specified ID
+    const printer = printers.find((printer) => printer.ID === ID);
+  
+    if (!printer) {
+      //console.error(`Printer with ID ${ID} not found.`);
+      return;
+    }
+  
+    const newStatus = printer.status === "Online" ? "Offline" : "Online";
+  
+    // Update the state
     setPrinters((prevPrinters) =>
       prevPrinters.map((printer) =>
-        printer.id === id
-          ? {
-              ...printer,
-              status:
-                printer.status === "Trạng thái: Đang Bật"
-                  ? "Trạng thái: Đang Tắt"
-                  : "Trạng thái: Đang Bật",
-            }
+        printer.ID === ID
+          ? { ...printer, status: newStatus }
           : printer
       )
     );
+  
+    try {
+      //console.log(`Updating status to ${newStatus} for printer ID: ${ID}`);
+      const response = await fetch('http://localhost:5001/api/printers/updateStatus', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ID: ID,
+          status: newStatus, // Send the new status
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update printer status');
+      }
+  
+      const data = await response.json();
+      //console.log('Printer status updated successfully:', data);
+    } catch (error) {
+      //console.error('Error updating printer status:', error);
+    }
   };
+  
 
-  const handleSelectPrinter = (id) => {
-    setSelectedPrinters((prevSelected) =>
-      prevSelected.includes(id)
-        ? prevSelected.filter((printerId) => printerId !== id)
-        : [...prevSelected, id]
-    );
+  const handleSelectPrinter = (ID) => {
+    setSelectedPrinters((prevSelected) => {
+      const updatedSelected = prevSelected.includes(ID)
+        ? prevSelected.filter((printerID) => printerID !== ID)
+        : [...prevSelected, ID];
+      //console.log("Updated Selected Printers:", updatedSelected);
+      return updatedSelected;
+    });
   };
-
+  
   const handleDeletePrinters = () => {
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = () => {
+  const deletePrinter = async (delete_printers) => {
+    try {
+      const response = await fetch(`${backendUrl}/api/printers/deletePrinter`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          delete: delete_printers
+        }),
+      });
+      
+      return response;
+    } catch (err) {
+      //console.error('Lỗi khi xóa loại file:', err);
+    }
+  };
+
+  const confirmDelete = async () => {
+    // DELETE IN DATABASE
+    const response = await deletePrinter(selectedPrinters);
     setPrinters((prevPrinters) =>
-      prevPrinters.filter((printer) => !selectedPrinters.includes(printer.id))
+      prevPrinters.filter((printer) => !selectedPrinters.includes(printer.ID))
     );
-    setSelectedPrinters([]);
-    setShowDeleteModal(false);
+    if (response.ok) {
+      //console.log("DELETION SUCCESS");
+      setSelectedPrinters([]);
+      setShowDeleteModal(false);
+    } else {
+      //console.error('Không thể xóa loại file');
+    }
   };
 
   // Cancel deletion
@@ -163,17 +279,30 @@ export const ManagerPrint = () => {
         </div>
       )}
       {/* Printer Addition Form */}
+      
       <form className="add-printer-form" onSubmit={handleSubmit}>
         <h2>Add New Printer</h2>
+        
         <div className="form-group">
-          <label>Printer Name:</label>
+          <label>Brand:</label>
           <input
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={brand}
+            onChange={(e) => setBrand(e.target.value)}
             required
           />
         </div>
+        
+        <div className="form-group">
+          <label>Model:</label>
+          <input
+            type="text"
+            value={model}
+            onChange={(e) => setModel(e.target.value)}
+            required
+          />
+        </div>
+        
         <div className="form-group">
           <label>Location:</label>
           <input
@@ -183,6 +312,19 @@ export const ManagerPrint = () => {
             required
           />
         </div>
+        
+        <div className="form-group">
+          <label>Status:</label>
+          <select 
+            value={status} 
+            onChange={(e) => setStatus(e.target.value)}
+            required
+          >
+            <option value="Offline">Offline</option>
+            <option value="Online">Online</option>
+          </select>
+        </div>
+        
         <button type="submit" className="add-printer-button">
           Thêm máy in
         </button>
@@ -196,29 +338,34 @@ export const ManagerPrint = () => {
         ) : (
           <ul>
             {printers.map((printer) => (
-              <li key={printer.id} className="printer-item">
+              <li key={printer.ID} className="printer-item">
                 <input
                   type="checkbox"
-                  checked={selectedPrinters.includes(printer.id)}
-                  onChange={() => handleSelectPrinter(printer.id)}
+                  checked={selectedPrinters.includes(printer.ID)}
+                  onChange={() => handleSelectPrinter(printer.ID)}
                 />
-                <strong>{printer.name}</strong> - {printer.location} (
-                {printer.status})
+                <div className="printer-details">
+                  <p><strong>Brand:</strong> {printer.brand}</p>
+                  <p><strong>Model:</strong> {printer.model}</p>
+                  <p><strong>Location:</strong> {printer.location}</p>
+                  <p><strong>Status:</strong> {printer.status}</p>
+                </div>
                 <button
                   className={`toggle-status-button ${
-                    printer.status === "Trạng thái: Đang Bật"
+                    printer.status === "Online"
                       ? "inactive"
                       : "active"
                   }`}
-                  onClick={() => togglePrinterStatus(printer.id)}
+                  onClick={() => togglePrinterStatus(printer.ID)}
                 >
-                  {printer.status === "Trạng thái: Đang Bật" ? "Tắt" : "Bật"}
+                  {printer.status === "Online" ? "Tắt" : "Bật"}
                 </button>
               </li>
             ))}
           </ul>
         )}
       </div>
+
 
       {/* xoá */}
       {selectedPrinters.length > 0 && (
