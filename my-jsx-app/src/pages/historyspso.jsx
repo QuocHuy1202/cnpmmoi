@@ -72,11 +72,6 @@ export const HistorySPSO = () => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token); // Set login status based on token existence
   }, []);
-  useEffect(() => {
-    // Sample data loading
-    setPrinters(samplePrinters);
-    setStudents(sampleStudents);
-  }, []);
 
   useEffect(() => {
     const handleResize = () => setIsMobileView(window.innerWidth <= 768);
@@ -88,27 +83,112 @@ export const HistorySPSO = () => {
     setIsPopupOpen(!isPopupOpen);
   };
 
+  // useEffect(() => {
+  //   const fetchPrinters = async () => {
+  //     try {
+  //       const response = await fetch("http://localhost:5001/api/spsoprinter");
+  //       if (response.ok) {
+  //         const data = await response.json();
+  //         setPrinters(data); 
+  //       } else {
+  //         console.error("Lỗi khi lấy danh sách máy in:", response.statusText);
+  //       }
+  //     } catch (error) {
+  //       console.error("Lỗi khi gọi API máy in:", error);
+  //     }
+  //   };
+
+  //   fetchPrinters();
+  // }, []);
+
+  useEffect(() => {
+    // Lấy danh sách máy in khi khởi tạo component
+    const fetchPrinters = async () => {
+      try {
+        const response = await fetch("http://localhost:5001/api/spsoprinter");
+        if (response.ok) {
+          const data = await response.json();
+          setPrinters(data); 
+        } else {
+          console.error("Lỗi khi lấy danh sách máy in:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Lỗi khi gọi API máy in:", error);
+      }
+    };
+  
+    fetchPrinters();
+  }, []); // Chạy một lần khi component được mount
+  
+
+  useEffect(() => {
+    const fetchPrinterDetails = async (printerId) => {
+      try {
+        const response = await fetch("http://localhost:5001/api/detailprinter");
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Lọc dữ liệu theo Printer_ID nếu có selectedPrinter
+          const filteredData = printerId 
+            ? data.filter(item => item.printer_ID === Number(printerId)) 
+            : data;
+  
+          setPrinterDetails(filteredData); // Cập nhật danh sách chi tiết
+          console.log("Lịch sử in:", filteredData);
+        } else {
+          console.error("Lỗi khi gọi API detailprinter:", response.statusText);
+          setPrinterDetails([]);
+        }
+      } catch (error) {
+        console.error("Lỗi khi gọi API detailprinter:", error);
+        setPrinterDetails([]);
+      }
+    };
+  
+    // Gọi API nếu có selectedPrinter
+    if (selectedPrinter) {
+      fetchPrinterDetails(selectedPrinter);
+    } else {
+      setPrinterDetails([]); // Reset khi không có máy in được chọn
+    }
+  }, [selectedPrinter]); // Theo dõi `selectedPrinter`
+  
+
+  
+  
   const handlePrinterChange = (e) => {
-    const printerId = e.target.value;
-    setSelectedPrinter(printerId);
-
-    if (printerId) {
-      setPrinterDetails(samplePrinterDetails);
-    } else {
-      setPrinterDetails([]);
-    }
+    const printerId = e.target.value; // Lấy giá trị từ dropdown
+    setSelectedPrinter(printerId && printerId !== "tất cả" ? printerId : null); // Xử lý logic chọn "tất cả"
   };
 
-  const handleSearchStudent = () => {
-    const student = students.find((student) => student.id === mssv);
-    if (student) {
-      setSelectedStudent(student.id);
-      setStudentDetails(sampleStudentDetails);
-    } else {
-      alert("Sinh viên không tìm thấy!");
-      setStudentDetails([]);
+  
+
+  const handleSearchStudent = async () => {
+    try {
+      // Gọi API lấy dữ liệu từ bảng `detailprinter`
+      const response = await fetch("http://localhost:5001/api/detailprinter");
+      if (response.ok) {
+        const data = await response.json();
+  
+        // Tìm dữ liệu liên quan đến MSSV nhập vào
+        const studentDetails = data.filter((item) => item.student_ID.toString() === mssv);
+  
+        if (studentDetails.length > 0) {
+          setSelectedStudent(mssv); // Cập nhật MSSV đang chọn
+          setStudentDetails(studentDetails); // Cập nhật lịch sử in của sinh viên
+        } else {
+          alert("Không tìm thấy dữ liệu cho MSSV này!");
+          setSelectedStudent(null);
+          setStudentDetails([]);
+        }
+      } else {
+        console.error("Lỗi khi gọi API detailprinter:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Lỗi khi gọi API detailprinter:", error);
     }
   };
+  
 
   return (
     <div className="app">
@@ -162,8 +242,8 @@ export const HistorySPSO = () => {
             <select value={selectedPrinter} onChange={handlePrinterChange}>
               <option value="">Chọn máy in</option>
               {printers.map((printer) => (
-                <option key={printer.id} value={printer.id}>
-                  {printer.name}
+                <option key={printer.printer_ID} value={printer.printer_ID}>
+                  {printer.brand} - {printer.model}
                 </option>
               ))}
             </select>
@@ -171,30 +251,30 @@ export const HistorySPSO = () => {
 
           {/* Hiển thị thông tin máy in */}
           {selectedPrinter && printerDetails.length > 0 && (
-            <div className="printer-details">
-              <h2>Thông tin Máy in</h2>
-              <table className="details-table">
-                <thead>
-                  <tr>
-                    <th>Tên file</th>
-                    <th>Số lượng in</th>
-                    <th>Định dạng file</th>
-                    <th>Ngày tháng in</th> {/* Thêm cột ngày tháng in */}
-                  </tr>
-                </thead>
-                <tbody>
-                  {printerDetails.map((detail, index) => (
-                    <tr key={index}>
-                      <td>{detail.fileName}</td>
-                      <td>{detail.printQuantity}</td>
-                      <td>{detail.fileFormat}</td>
-                      <td>{detail.printDate}</td> {/* Hiển thị ngày tháng in */}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+  <div className="printer-details">
+    <h2>Thông tin Máy in</h2>
+    <table className="details-table">
+      <thead>
+        <tr>
+          <th>Tên file</th>
+          <th>Số lượng in</th>
+          <th>Định dạng file</th>
+          <th>Ngày tháng in</th>
+        </tr>
+      </thead>
+      <tbody>
+        {printerDetails.map((detail, index) => (
+          <tr key={index}>
+            <td>{detail.file_name}</td>
+            <td>{detail.number_of_pages}</td>
+            <td>{detail.file_type}</td>
+            <td>{detail.print_time}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
 
           {/* Tìm kiếm sinh viên */}
           <div className="student-search">
@@ -216,7 +296,7 @@ export const HistorySPSO = () => {
                 <thead>
                   <tr>
                     <th>MSSV</th> {/* Cột MSSV */}
-                    <th>Tên Sinh viên</th> {/* Cột Tên sinh viên */}
+                    <th>Tên Sinh viên</th> {/* Cột Tên sinh viên */} 
                     <th>Tên file</th>
                     <th>Số lượng in</th>
                     <th>Định dạng file</th>
@@ -228,12 +308,12 @@ export const HistorySPSO = () => {
                     <tr key={index}>
                       <td>{mssv}</td>
                       <td>
-                        {students.find((student) => student.id === mssv)?.name}
+                        {students.find((student) => student.student_ID === mssv)?.name}
                       </td>{" "}
-                      <td>{detail.fileName}</td>
-                      <td>{detail.printQuantity}</td>
-                      <td>{detail.fileFormat}</td>
-                      <td>{detail.printDate}</td>
+                      <td>{detail.file_name}</td>
+                      <td>{detail.number_of_pages}</td>
+                      <td>{detail.file_type}</td>
+                      <td>{detail.print_time}</td>
                     </tr>
                   ))}
                 </tbody>
