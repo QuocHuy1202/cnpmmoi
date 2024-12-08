@@ -9,6 +9,8 @@ const printerRoutes = require("./routes/printerRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const adjustRoutes = require("./routes/adjustRoutes");
 const printHistoryRoutes = require("./routes/printhistoryRoutes");
+const SPSOprinterRoutes = require("./routes/SPSOprinterRoutes");
+const detailprinterRoutes = require("./routes/detailprinterRoutes");
 // Import thêm các routes khác nếu cần
 
 const app = express();
@@ -24,6 +26,8 @@ app.use("/api/printers", printerRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/adjust", adjustRoutes);
 app.use("/api/history", printHistoryRoutes);
+app.use("/api/spsoprinter", SPSOprinterRoutes);
+app.use("/api/detailprinter", detailprinterRoutes);
 // Thêm các routes khác tương ứng
 
 
