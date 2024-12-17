@@ -38,7 +38,11 @@ export const Profile = () => {
   
   useEffect(() => {
     const token = localStorage.getItem("token");
-    axios.get("http://localhost:5001/api/account/get")
+    axios.get("http://localhost:5001/api/account/get", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then(response => {
         
         setStatus(response.data.status);

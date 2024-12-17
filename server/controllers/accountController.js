@@ -34,8 +34,8 @@ const login = async (req, res) => {
   }
 };
 const get = async (req, res) => {
-  const  email  = "user2@hcmut.edu.vn";
-
+  const   email  = req.user.id;
+  
   try {
     const user = await getAccountByEmail(email);
 

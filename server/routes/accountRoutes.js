@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.post("/login", login);
 router.post("/update-pages",verifyToken(), updatePages);
-router.get("/get", get);
+router.get("/get", verifyToken(), get);
 router.get("/students", verifyToken("SPSO"), fetchAllStudents);
 module.exports = router;
