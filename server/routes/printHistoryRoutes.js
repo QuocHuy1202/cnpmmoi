@@ -1,9 +1,10 @@
 const express = require("express");
-const { getPrintHistoryController } = require("../controllers/printhistoryController");
-
+const {  fetchPrintHistory } = require("../controllers/printhistoryController");
+const { verifyToken } = require("../middlewares/authMiddleware");
 const router = express.Router();
 
 // Định nghĩa route để lấy lịch sử in
-router.get("/", getPrintHistoryController);
+
+router.get("/print-history", verifyToken("SPSO"), fetchPrintHistory);
 
 module.exports = router;

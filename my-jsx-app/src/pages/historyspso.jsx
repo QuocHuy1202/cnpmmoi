@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import image from "../image/image.png";
 import avar from "../image/avar.svg";
 import "../css/printhistory.css";
 import "../css/historyspso.css";
-
+import { toast, ToastContainer } from "react-toastify";
 export const HistorySPSO = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
@@ -15,66 +16,65 @@ export const HistorySPSO = () => {
   const [selectedPrinter, setSelectedPrinter] = useState("");
   const [studentDetails, setStudentDetails] = useState([]);
   const [printerDetails, setPrinterDetails] = useState([]);
-  const [isAvatarPopupOpen, setIsAvatarPopupOpen] = useState(false); // Popup for avatar
+  const [printHistory, setPrintHistory] = useState([]); // Store print history
+  const [isAvatarPopupOpen, setIsAvatarPopupOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate(); // Hook to navigate user
+  const navigate = useNavigate();
 
-  // bảng ví dụ select lại cho phù hợp
-  const samplePrinters = [
-    { id: "tất cả", name: "tất cả máy in" },
-    { id: "printer1", name: "Printer 1" },
-    { id: "printer2", name: "Printer 2" },
-  ];
-
-  const sampleStudents = [
-    { id: "2213732", name: "Student 1" },
-    { id: "2212345", name: "Student 2" },
-  ];
-
-  const samplePrinterDetails = [
-    {
-      fileName: "file1.pdf",
-      printQuantity: 10,
-      fileFormat: "PDF",
-      printDate: "2023-10-01",
-    },
-    {
-      fileName: "file2.docx",
-      printQuantity: 5,
-      fileFormat: "DOCX",
-      printDate: "2023-10-02",
-    },
-  ];
-
-  const sampleStudentDetails = [
-    {
-      fileName: "file1.pdf",
-      printQuantity: 10,
-      fileFormat: "PDF",
-      printDate: "2023-10-01",
-    },
-    {
-      fileName: "file2.docx",
-      printQuantity: 5,
-      fileFormat: "DOCX",
-      printDate: "2023-10-02",
-    },
-  ];
-  const toggleAvatarPopup = () => {
-    setIsAvatarPopupOpen(!isAvatarPopupOpen); // Toggle avatar popup
-  };
-  const handleLogout = () => {
-    localStorage.clear(); // Xóa tất cả các mục trong localStorage
-    setIsLoggedIn(false); // Update the logged-in status
-    navigate("/login"); // Redirect user to the login page
-  };
+  // Fetch printers and students data from API
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token); // Set login status based on token existence
+    axios.get("http://localhost:5001/api/printers/printers")
+      .then(response => {
+        setPrinters(response.data);
+      })
+      .catch(error => {
+        console.error("Error fetching printers:", error);
+      });
+
+      axios.get("http://localhost:5001/api/account/students", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then(response => {
+          setStudents(response.data);
+        })
+        .catch(error => {
+          console.error("Error fetching students:", error);
+        });
+      
+      axios.get("http://localhost:5001/api/history/print-history", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then(response => {
+          setPrintHistory(response.data);
+        })
+        .catch(error => {
+          console.error("Error fetching history:", error);
+        });
   }, []);
 
   useEffect(() => {
-    const handleResize = () => setIsMobileView(window.innerWidth <= 768);
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  }, []);
+
+  const toggleAvatarPopup = () => {
+    setIsAvatarPopupOpen(!isAvatarPopupOpen);
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    setIsLoggedIn(false);
+    navigate("/login");
+  };
+
+  const handleResize = () => setIsMobileView(window.innerWidth <= 768);
+
+  useEffect(() => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -83,112 +83,81 @@ export const HistorySPSO = () => {
     setIsPopupOpen(!isPopupOpen);
   };
 
-  // useEffect(() => {
-  //   const fetchPrinters = async () => {
-  //     try {
-  //       const response = await fetch("http://localhost:5001/api/spsoprinter");
-  //       if (response.ok) {
-  //         const data = await response.json();
-  //         setPrinters(data); 
-  //       } else {
-  //         console.error("Lỗi khi lấy danh sách máy in:", response.statusText);
-  //       }
-  //     } catch (error) {
-  //       console.error("Lỗi khi gọi API máy in:", error);
-  //     }
-  //   };
-
-  //   fetchPrinters();
-  // }, []);
-
-  useEffect(() => {
-    // Lấy danh sách máy in khi khởi tạo component
-    const fetchPrinters = async () => {
-      try {
-        const response = await fetch("http://localhost:5001/api/spsoprinter");
-        if (response.ok) {
-          const data = await response.json();
-          setPrinters(data); 
-        } else {
-          console.error("Lỗi khi lấy danh sách máy in:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Lỗi khi gọi API máy in:", error);
-      }
-    };
-  
-    fetchPrinters();
-  }, []); // Chạy một lần khi component được mount
-  
-
-  useEffect(() => {
-    const fetchPrinterDetails = async (printerId) => {
-      try {
-        const response = await fetch("http://localhost:5001/api/detailprinter");
-        if (response.ok) {
-          const data = await response.json();
-          
-          // Lọc dữ liệu theo Printer_ID nếu có selectedPrinter
-          const filteredData = printerId 
-            ? data.filter(item => item.printer_ID === Number(printerId)) 
-            : data;
-  
-          setPrinterDetails(filteredData); // Cập nhật danh sách chi tiết
-          console.log("Lịch sử in:", filteredData);
-        } else {
-          console.error("Lỗi khi gọi API detailprinter:", response.statusText);
-          setPrinterDetails([]);
-        }
-      } catch (error) {
-        console.error("Lỗi khi gọi API detailprinter:", error);
-        setPrinterDetails([]);
-      }
-    };
-  
-    // Gọi API nếu có selectedPrinter
-    if (selectedPrinter) {
-      fetchPrinterDetails(selectedPrinter);
-    } else {
-      setPrinterDetails([]); // Reset khi không có máy in được chọn
-    }
-  }, [selectedPrinter]); // Theo dõi `selectedPrinter`
-  
-
-  
-  
   const handlePrinterChange = (e) => {
-    const printerId = e.target.value; // Lấy giá trị từ dropdown
-    setSelectedPrinter(printerId && printerId !== "tất cả" ? printerId : null); // Xử lý logic chọn "tất cả"
+    const printerId = e.target.value;
+    setSelectedPrinter(printerId);
+    
+    
   };
 
   
+  const searching = () => {
+    const token = localStorage.getItem("token"); 
 
-  const handleSearchStudent = async () => {
-    try {
-      // Gọi API lấy dữ liệu từ bảng `detailprinter`
-      const response = await fetch("http://localhost:5001/api/detailprinter");
-      if (response.ok) {
-        const data = await response.json();
-  
-        // Tìm dữ liệu liên quan đến MSSV nhập vào
-        const studentDetails = data.filter((item) => item.student_ID.toString() === mssv);
-  
-        if (studentDetails.length > 0) {
-          setSelectedStudent(mssv); // Cập nhật MSSV đang chọn
-          setStudentDetails(studentDetails); // Cập nhật lịch sử in của sinh viên
-        } else {
-          alert("Không tìm thấy dữ liệu cho MSSV này!");
-          setSelectedStudent(null);
-          setStudentDetails([]);
-        }
+if (selectedPrinter && mssv) {
+  axios
+    .get(`http://localhost:5001/api/history/print-history?printerId=${selectedPrinter}&mssv=${mssv}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => {
+      setPrintHistory(response.data); // Set print history for selected printer
+    })
+    .catch((error) => {
+      console.error("Error fetching print history:", error);
+    });
+} else if (selectedPrinter) {
+  axios
+    .get(`http://localhost:5001/api/history/print-history?printerId=${selectedPrinter}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => {
+      setPrintHistory(response.data); // Set print history for selected printer
+    })
+    .catch((error) => {
+      console.error("Error fetching print history for printer:", error);
+    });
+} else if (mssv) {
+  axios
+    .get(`http://localhost:5001/api/history/print-history?mssv=${mssv}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => {
+      if (response.data && response.data.length > 0) {
+        // If print history is found, update the state
+        setPrintHistory(response.data);
       } else {
-        console.error("Lỗi khi gọi API detailprinter:", response.statusText);
+        // If no print history found, show an alert
+        setPrintHistory([]); // Clear any existing print history
+        toast.error("Không tìm thấy lịch sử in");
       }
-    } catch (error) {
-      console.error("Lỗi khi gọi API detailprinter:", error);
-    }
+    })
+    .catch((error) => {
+      // Handle any error (e.g., network error)
+      setPrintHistory([]); // Clear any existing print history
+      toast.error("Không tìm thấy lịch sử in");
+    });
+} else {
+  axios
+    .get(`http://localhost:5001/api/history/print-history`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => {
+      setPrintHistory(response.data); // Set print history for all printers
+    })
+    .catch((error) => {
+      console.error("Error fetching print history:", error);
+    });
+}
+
   };
-  
 
   return (
     <div className="app">
@@ -201,31 +170,22 @@ export const HistorySPSO = () => {
             </button>
           ) : (
             <nav className="navbar">
-              <Link to="/spso" className="trangchuls">
-                Trang chủ
-              </Link>
-              <Link to="/managerprint" className="quanlils">
-                Quản lí máy in
-              </Link>
-              <Link to="/adjust" className="dieuchinhls">
-                Điều chỉnh
-              </Link>
-              <Link to="/historyspso" className="xemls">
-                Xem lịch sử in
-              </Link>
+              <Link to="/spso" className="trangchuls">Trang chủ</Link>
+              <Link to="/managerprint" className="quanlils">Quản lí máy in</Link>
+              <Link to="/adjust" className="dieuchinhls">Điều chỉnh</Link>
+              <Link to="/historyspso" className="xemls">Xem lịch sử in</Link>
             </nav>
           )}
         </nav>
         {isLoggedIn ? (
           <div className="avatar-link" onClick={toggleAvatarPopup}>
-            <img src={avar} alt="hAnh" className="hAnh" /> {/* Avatar */}
+            <img src={avar} alt="Avatar" className="hAnh" />
           </div>
         ) : (
-          <Link to="/login" className="dangnhap">
-            Đăng nhập
-          </Link>
+          <Link to="/login" className="dangnhap">Đăng nhập</Link>
         )}
       </header>
+
       {isAvatarPopupOpen && isLoggedIn && (
         <div className="avatar-popup">
           <ul>
@@ -233,87 +193,60 @@ export const HistorySPSO = () => {
           </ul>
         </div>
       )}
+
       <div className="history-content">
-        <h1>Quản lý máy in và sinh viên</h1>
+        <h1>Tìm kiếm theo máy in và MSSV</h1>
         <div className="option">
-          {/* Chọn máy in */}
+          {/* Printer selection */}
           <div className="printer-selection">
             <h2>Chọn máy in</h2>
             <select value={selectedPrinter} onChange={handlePrinterChange}>
-              <option value="">Chọn máy in</option>
+              <option value="">Tất cả máy in</option>
               {printers.map((printer) => (
-                <option key={printer.printer_ID} value={printer.printer_ID}>
-                  {printer.brand} - {printer.model}
-                </option>
+                <option key={printer.printer_ID} value={printer.printer_ID}>{printer.model}</option>
               ))}
             </select>
           </div>
 
-          {/* Hiển thị thông tin máy in */}
-          {selectedPrinter && printerDetails.length > 0 && (
-  <div className="printer-details">
-    <h2>Thông tin Máy in</h2>
-    <table className="details-table">
-      <thead>
-        <tr>
-          <th>Tên file</th>
-          <th>Số lượng in</th>
-          <th>Định dạng file</th>
-          <th>Ngày tháng in</th>
-        </tr>
-      </thead>
-      <tbody>
-        {printerDetails.map((detail, index) => (
-          <tr key={index}>
-            <td>{detail.file_name}</td>
-            <td>{detail.number_of_pages}</td>
-            <td>{detail.file_type}</td>
-            <td>{detail.print_time}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)}
+          {/* Display printer details */}
 
-          {/* Tìm kiếm sinh viên */}
+          {/* Search student */}
           <div className="student-search">
-            <h2>Tìm kiếm sinh viên theo MSSV</h2>
+            <h2>MSSV</h2>
             <input
               type="text"
               placeholder="Nhập MSSV"
               value={mssv}
               onChange={(e) => setMssv(e.target.value)}
             />
-            <button onClick={handleSearchStudent}>Tìm kiếm</button>
+            <button onClick={searching}>Tìm kiếm</button>
           </div>
 
-          {/*!  Hiển thị thông tin sinh viên */}
-          {studentDetails.length > 0 && (
+          {/* Display student details */}
+          {printHistory.length > 0 && (
             <div className="student-details">
-              <h2>Thông tin Sinh viên</h2>
+              <h2>Lịch sử in ấn</h2>
               <table className="details-table">
                 <thead>
                   <tr>
-                    <th>MSSV</th> {/* Cột MSSV */}
-                    <th>Tên Sinh viên</th> {/* Cột Tên sinh viên */} 
+                    <th>MSSV</th>
+                    <th>email</th>
                     <th>Tên file</th>
                     <th>Số lượng in</th>
-                    <th>Định dạng file</th>
+            
                     <th>Ngày tháng in</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {studentDetails.map((detail, index) => (
+                  {printHistory.map((detail, index) => (
                     <tr key={index}>
-                      <td>{mssv}</td>
-                      <td>
-                        {students.find((student) => student.student_ID === mssv)?.name}
-                      </td>{" "}
-                      <td>{detail.file_name}</td>
-                      <td>{detail.number_of_pages}</td>
-                      <td>{detail.file_type}</td>
-                      <td>{detail.print_time}</td>
+                      <td>{detail.student_id}</td>
+                      <td>{detail.account_email}</td>
+                      <td>{detail.printed_file}</td>
+                      <td>{detail.settings ? JSON.parse(detail.settings).copies : "N/A"}</td>
+
+
+                      <td>{detail.printed_time}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -326,18 +259,10 @@ export const HistorySPSO = () => {
       {isPopupOpen && isMobileView && (
         <div className="popup">
           <ul>
-            <Link to="/spso" onClick={togglePopup}>
-              <li>Trang Chủ</li>
-            </Link>
-            <Link to="/managerprint" onClick={togglePopup}>
-              <li>Quản lí máy in</li>
-            </Link>
-            <Link to="/adjust" onClick={togglePopup}>
-              <li>Điều Chỉnh</li>
-            </Link>
-            <Link to="/historyspso" onClick={togglePopup}>
-              <li>Xem lịch sử in</li>
-            </Link>
+            <Link to="/spso" onClick={togglePopup}><li>Trang Chủ</li></Link>
+            <Link to="/managerprint" onClick={togglePopup}><li>Quản lí máy in</li></Link>
+            <Link to="/adjust" onClick={togglePopup}><li>Điều Chỉnh</li></Link>
+            <Link to="/historyspso" onClick={togglePopup}><li>Xem lịch sử in</li></Link>
           </ul>
         </div>
       )}

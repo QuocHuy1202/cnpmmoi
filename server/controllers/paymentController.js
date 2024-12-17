@@ -2,7 +2,7 @@ const { createPayment, getPaymentHistoryByEmail } = require("../models/paymentMo
 
 const processPayment = async (req, res) => {
   const { pagesToBuy, totalAmount, status } = req.body;
-  const { email } = req.user; // Lấy email từ token đã xác thực
+  const  email  = req.user.id; // Lấy email từ token đã xác thực
 
   try {
     // Gọi Model để lưu thông tin thanh toán
@@ -18,8 +18,8 @@ const processPayment = async (req, res) => {
 
 
 const getPaymentHistory = async (req, res) => {
-    const { email } = req.user; // Lấy email từ token đã xác thực
-  
+    const  email  = req.user.id; // Lấy email từ token đã xác thực
+    
     try {
       // Gọi Model để lấy lịch sử thanh toán
       const payments = await getPaymentHistoryByEmail(email);

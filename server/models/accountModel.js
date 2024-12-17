@@ -16,8 +16,12 @@ const updateRemainingPages = async (email, number_of_pages_remaining) => {
   const result = await pool.request()
     .input("email", email)
     .input("number_of_pages_remaining", number_of_pages_remaining)
-    .query("UPDATE account SET number_of_pages_remaining = @number_of_pages_remaining WHERE email = @email");
+    .query("UPDATE Student SET number_of_pages_remaining = @number_of_pages_remaining WHERE email = @email");
   return result.rowsAffected[0];
 };
-
-module.exports = { getAccountByEmail, updateRemainingPages };
+const getAllStudents = async () => {
+  const pool = await connectDB();
+  const result = await pool.request().query("SELECT MSSV FROM Student");
+  return result.recordset;
+};
+module.exports = { getAccountByEmail, updateRemainingPages, getAllStudents};

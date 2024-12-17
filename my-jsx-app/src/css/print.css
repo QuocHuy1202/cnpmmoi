@@ -176,6 +176,7 @@ body {
     cursor: pointer;
     width: 148px; /* Đặt kích thước cố định */
     margin: 0px 20px;
+    color: #000;
 }
 .from-tai-khoan:hover {
     background-color: #e2e2e2; /* Màu nền khi hover */
@@ -187,7 +188,7 @@ body {
     border-radius: 5px;
     cursor: pointer;
     width: 148px;
-    
+    color: #000;
 }
 .upload-btn:hover {
     background-color: #e2e2e2; /* Màu nền khi hover */
@@ -260,7 +261,8 @@ body {
     cursor: pointer;
     width: 148px; /* Kích thước cố định như nút tải lên */
     margin-bottom: 20px;
-    margin-top: 20px; /* Khoảng cách giữa nút này và nút chọn máy in */
+    margin-top: 20px;
+    color: #000; /* Khoảng cách giữa nút này và nút chọn máy in */
   }
   
   .print-setting-btn:hover {

@@ -133,12 +133,19 @@ export const ManagerPrint = () => {
   };
 
   const togglePrinterStatus = async (ID) => {
+    
+   // Giả sử bạn muốn tìm máy in có printer_ID là 3
+
+
+
     // Find the printer with the specified ID
-    const printer = printers.find((printer) => printer.ID === ID);
+    const printer = printers.find((printer) => printer.printer_ID === ID);
+
   
     if (!printer) {
-      //console.error(`Printer with ID ${ID} not found.`);
       return;
+      //console.error(`Printer with ID ${ID} not found.`);
+      
     }
   
     const newStatus = printer.status === "Online" ? "Offline" : "Online";
@@ -146,7 +153,7 @@ export const ManagerPrint = () => {
     // Update the state
     setPrinters((prevPrinters) =>
       prevPrinters.map((printer) =>
-        printer.ID === ID
+        printer.printer_ID === ID
           ? { ...printer, status: newStatus }
           : printer
       )
@@ -341,8 +348,8 @@ export const ManagerPrint = () => {
               <li key={printer.ID} className="printer-item">
                 <input
                   type="checkbox"
-                  checked={selectedPrinters.includes(printer.ID)}
-                  onChange={() => handleSelectPrinter(printer.ID)}
+                  checked={selectedPrinters.includes(printer.printer_ID)}
+                  onChange={() => handleSelectPrinter(printer.printer_ID)}
                 />
                 <div className="printer-details">
                   <p><strong>Brand:</strong> {printer.brand}</p>
@@ -356,7 +363,7 @@ export const ManagerPrint = () => {
                       ? "inactive"
                       : "active"
                   }`}
-                  onClick={() => togglePrinterStatus(printer.ID)}
+                  onClick={() => togglePrinterStatus(printer.printer_ID)}
                 >
                   {printer.status === "Online" ? "Tắt" : "Bật"}
                 </button>

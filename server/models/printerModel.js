@@ -70,7 +70,7 @@ const deletePrinterQuery = async (delete_printers) => {
       .input("ID", printerId)
       .query(`
         DELETE FROM Printer
-        WHERE ID = @ID
+        WHERE printer_ID = @ID
       `);
       if (result.affectedRows === 0) {
         //console.log(`Printer with ID ${printerId} not found.`);
@@ -91,7 +91,7 @@ const updatePrinterStatusQuery = async (ID, status) => {
     .query(`
       UPDATE Printer
       SET status = @status
-      WHERE ID = @ID;
+      WHERE printer_ID = @ID;
     `);
   //console.log(result);
 }

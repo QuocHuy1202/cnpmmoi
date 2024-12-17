@@ -1,39 +1,43 @@
 const connectDB = require("../config/sqlConfig"); // Import kết nối database
 
 // Lấy danh sách lịch sử in
-const getPrintHistory = async () => {
+
+
+const getPrintHistorySPSO = async (printerId, mssv) => {
   const query = `
     SELECT 
-      ph.print_ID,
-      ph.file_name,
-      ph.file_type,
-      ph.number_of_pages,
-      ph.paper_size,
-      ph.is_doubled_side,
-      ph.print_time,
-      s.name AS student_name,
-      s.email AS student_email,
-      p.brand AS printer_brand,
-      p.model AS printer_model,
-      p.location AS printer_location
+      pr.id AS print_request_id,
+      st.MSSV AS student_id,
+      st.number_of_pages_remaining AS remaining_pages,
+      a.email AS account_email,
+      a.account_type AS account_role,
+      pr.file_name AS printed_file,
+      pr.printer AS printer_name,
+      pr.print_settings AS settings,
+      pr.status AS print_status,
+      pr.created_at AS printed_time
     FROM 
-      PrintHistory ph
-    INNER JOIN 
-      Student s ON ph.student_ID = s.student_ID
-    INNER JOIN 
-      Printer p ON ph.printer_ID = p.printer_ID
-    ORDER BY 
-      ph.print_time DESC;
+      print_requests pr
+    LEFT JOIN 
+      account a ON pr.email = a.email
+    LEFT JOIN 
+      student st ON a.email = st.email
+    WHERE 
+      (@printerId IS NULL OR pr.printer = @printerId) AND
+      (@mssv IS NULL OR st.MSSV = @mssv)
   `;
+  
+  const pool = await connectDB();
+  const result = await pool.request()
+    .input("printerId", printerId || null)
+    .input("mssv",  mssv || null)
+    .query(query);
 
-  try {
-    const pool = await connectDB(); // Kết nối database
-    const result = await pool.request().query(query); // Thực thi query
-    return result.recordset; // Trả về danh sách kết quả
-  } catch (err) {
-    console.error("Lỗi khi truy vấn lịch sử in:", err);
-    throw err;
-  }
+  return result.recordset;
 };
 
-module.exports = { getPrintHistory };
+
+
+module.exports = {    getPrintHistorySPSO };
+
+

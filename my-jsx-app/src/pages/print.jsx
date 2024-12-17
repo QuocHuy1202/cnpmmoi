@@ -6,7 +6,8 @@ import { Link } from "react-router-dom";
 import image from "../image/image.png";
 import avar from "../image/avar.svg";
 import mayin from "../image/may-in.jpg";
-
+import { toast, ToastContainer } from "react-toastify";
+import Swal from 'sweetalert2';
 export const Print = () => {
   const [isUploading, setIsUploading] = useState(false);
   const getFileType = (fileName) => {
@@ -56,10 +57,20 @@ export const Print = () => {
     }
     const formData = new FormData();
     formData.append("file", file);
-
+  
     // Bắt đầu tải file, hiển thị thông báo
     setIsUploading(true);
-
+  
+    // Hiển thị SweetAlert thông báo khi tải lên
+    Swal.fire({
+      title: 'Đang tải lên...',
+      text: 'Vui lòng đợi trong khi file đang được tải lên.',
+      allowOutsideClick: false,  
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+  
     try {
       const response = await fetch("http://localhost:5001/api/files/upload", {
         method: "POST",
@@ -68,11 +79,15 @@ export const Print = () => {
         },
         body: formData,
       });
-
+  
       if (response.ok) {
         const result = await response.json();
-        alert("Tải lên file thành công: " + result.filePath);
-        console.log(getFileType(file.name));
+        Swal.fire({
+          icon: 'success',
+          title: 'Thành công!',
+          text: 'Tải file lên thành công',
+        });
+  
         // Cập nhật fileDetails với thông tin chi tiết về file
         const fileDetails = {
           name: file.name, // Tên file
@@ -80,7 +95,7 @@ export const Print = () => {
           uploadDate: new Date().toISOString(), // Ngày upload (theo định dạng ISO)
           path: result.filePath, // Đường dẫn file (sẽ nhận từ API)
         };
-
+  
         setFileDetails(fileDetails); // Lưu thông tin vào state
         localStorage.setItem("selectedFile", JSON.stringify(fileDetails)); // Lưu vào localStorage nếu cần
       } else {
@@ -93,8 +108,10 @@ export const Print = () => {
     } finally {
       // Kết thúc tải file, ẩn thông báo
       setIsUploading(false);
+       // Đóng SweetAlert sau khi tải lên xong
     }
   };
+  
 
   // Hàm xử lý chọn máy in
 
@@ -138,7 +155,7 @@ export const Print = () => {
     // Gọi API để lấy danh sách máy in
     const fetchPrinters = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/printers");
+        const response = await fetch("http://localhost:5001/api/printers/printers");
         const data = await response.json();
         setPrinters(data); // Cập nhật danh sách máy in
       } catch (error) {
@@ -314,7 +331,7 @@ export const Print = () => {
             <button className="upload-btn">
               <label htmlFor="file-upload">Tải lên</label>
               <div className="upload-notification">
-                {isUploading && <p>Đang tải lên, vui lòng đợi...</p>}
+                {isUploading }
               </div>
               <input
                 id="file-upload"

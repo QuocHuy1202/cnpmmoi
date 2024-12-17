@@ -3,17 +3,21 @@ import { Link, useNavigate } from "react-router-dom";
 import "../css/profile.css";
 import avar from "../image/avar.svg";
 import image from "../image/image.png";
-
+import axios from "axios";
 export const Profile = () => {
   const [pagesToBuy, setPagesToBuy] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const [paymentStatus, setPaymentStatus] = useState(null); // Trạng thái thanh toán
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [status, setStatus] = useState("");
+  const [name, setName] = useState("");
+  const [faculty, setFalcuty] = useState("");
+  const [MSSV, setMSSV] = useState("");
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
   const [numberOfPagesRemaining, setNumberOfPagesRemaining] = useState(0);
   const [isAvatarPopupOpen, setIsAvatarPopupOpen] = useState(false); // Popup for avatar
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+ 
   const navigate = useNavigate(); // Khởi tạo hook useHistory
   const toggleAvatarPopup = () => {
     setIsAvatarPopupOpen(!isAvatarPopupOpen); // Toggle avatar popup
@@ -28,28 +32,33 @@ export const Profile = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token); 
-    if(!token ) {navigate("/login");}// Set login status based on token existence
+    if(!token ) {navigate("/login");}
+   
   }, []);
+  
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    axios.get("http://localhost:5001/api/account/get")
+      .then(response => {
+        
+        setStatus(response.data.status);
+        setNumberOfPagesRemaining(response.data.number_of_pages_remaining);
+        setName(response.data.name);
+        setFalcuty(response.data.faculty);
+        setMSSV(response.data.mssv)
+      })
+      .catch(error => {
+        console.error("Error fetching printers:", error);
+      });
+    }, []);
+  
   useEffect(() => {
     const handleResize = () => setIsMobileView(window.innerWidth <= 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   // Load thông tin từ localStorage khi component load
-  useEffect(() => {
-    const statusFromStorage = localStorage.getItem("status");
-    const pagesRemainingFromStorage = localStorage.getItem(
-      "number_of_pages_remaining"
-    );
-
-    if (statusFromStorage) {
-      setStatus(statusFromStorage);
-    }
-
-    if (pagesRemainingFromStorage) {
-      setNumberOfPagesRemaining(parseInt(pagesRemainingFromStorage));
-    }
-  }, []);
+ 
   const togglePopup = () => {
     setIsPopupOpen(!isPopupOpen);
   };
@@ -163,6 +172,15 @@ export const Profile = () => {
         <div className="profile-card">
           <h2 className="profile-title">Thông tin tài khoản</h2>
           <div className="profile-info">
+          <p>
+              Tên: <span>{name}</span>
+            </p>
+            <p>
+              MSSV: <span>{MSSV}</span>
+            </p>
+            <p>
+              Khoa: <span>{faculty}</span>
+            </p>
             <p>
               Trạng thái: <span>{status}</span>
             </p>

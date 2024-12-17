@@ -7,8 +7,8 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-router.post("/upload", verifyToken, upload.single("file"), uploadFile);
-router.get("/", verifyToken, files);
+router.post("/upload", verifyToken(), upload.single("file"), uploadFile);
+router.get("/", verifyToken(), files);
 
 
 module.exports = router;

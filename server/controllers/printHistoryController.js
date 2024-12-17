@@ -1,18 +1,18 @@
-const { getPrintHistory } = require("../models/printHistoryModel");
+const { getPrintHistory,getPrintHistorySPSO } = require("../models/printHistoryModel");
 
 // Controller lấy danh sách lịch sử in
-const getPrintHistoryController = async (req, res) => {
+
+const fetchPrintHistory = async (req, res) => {
+  const { printerId, mssv } = req.query;
+
   try {
-    const printHistory = await getPrintHistory(); // Lấy dữ liệu từ model
-    if (printHistory.length > 0) {
-      res.status(200).json(printHistory); // Trả về dữ liệu JSON
-    } else {
-      res.status(404).json({ message: "Không có lịch sử in nào." });
-    }
-  } catch (error) {
-    console.error("Lỗi trong getPrintHistoryController:", error);
-    res.status(500).json({ message: "Lỗi server khi lấy lịch sử in.", error });
+    const history = await getPrintHistorySPSO(printerId, mssv);
+    res.status(200).json(history);
+  } catch (err) {
+    console.error("Lỗi khi lấy lịch sử in:", err);
+    res.status(500).send("Lỗi hệ thống");
   }
 };
 
-module.exports = { getPrintHistoryController };
+
+module.exports = {  fetchPrintHistory };

@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const { getFilesByEmail } = require("../models/fileModel");
 
 const files = async (req, res) => {
-    const { email } = req.user;
+    const  email  = req.user.id;
 
     try {
       
@@ -26,7 +26,7 @@ const { saveFileInfo } = require("../models/fileModel");
 const path = require("path");
 
 const uploadFile = async (req, res) => {
-  const { email } = req.user;  // Lấy email từ token
+  const  email  = req.user.id;  // Lấy email từ token
   const file = req.file;
 
   if (!file) {

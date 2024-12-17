@@ -2,7 +2,7 @@ const { getAllPrinters, createPrintRequest, getPrintHistoryByEmail, addPrinterQu
 
 const handlePrintRequest = async (req, res) => {
   const { fileDetails, printSettings, printer } = req.body;
-  const { email } = req.user; // Lấy email từ token đã xác thực
+  const  email  = req.user.id; // Lấy email từ token đã xác thực
 
   // Kiểm tra xem dữ liệu có đầy đủ không
   if (!fileDetails || !fileDetails.name || !printer || !printSettings) {
@@ -37,8 +37,9 @@ const handlePrintRequest = async (req, res) => {
 };
 
 const getPrintHistory = async (req, res) => {
-  const { email } = req.user; // Lấy email từ token đã xác thực
-
+  
+  const email = req.user.id; // Lấy email từ token đã xác thực
+  
   try {
     // Gọi Model để lấy lịch sử in
     const history = await getPrintHistoryByEmail(email);
